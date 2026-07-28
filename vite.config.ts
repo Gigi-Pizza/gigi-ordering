@@ -8,6 +8,10 @@ import { manifest } from "@gigi/runtime-manifest";
 // (one shared React instance, no duplicate copies).
 export default defineConfig({
   build: {
+    // Output under build/ordering so CI uploads to R2 key "ordering/index.mjs"
+    // (served at assets.gigipizza.ca/ordering/index.mjs = @gigi/ordering/index.mjs).
+    outDir: "build/ordering",
+    emptyOutDir: true,
     lib: {
       entry: ["src/index.tsx"],
       formats: ["es"],

@@ -16,10 +16,16 @@ It is a **slice**: a Vite library build that emits a single ESM entry
 
 ```bash
 npm install
-npm run dev        # slice dev server on http://localhost:5174 (matches host manifest)
+npm run serve      # build + preview on :5174 — what the HOST consumes (serves /index.mjs)
+npm run dev        # standalone slice dev server (edits only; serves /src/*, not /index.mjs)
 npm run build      # -> dist/index.mjs (React externalized)
 npm run typecheck
 ```
+
+> The host loads `@gigi/ordering/index.mjs`, which its dev import map maps to
+> `http://localhost:5174/index.mjs`. Only `vite preview` (serving the built
+> `dist/`) has a real file there, so use **`npm run serve`** when running with the
+> host — not `npm run dev`.
 
 ## Where the real app goes
 
@@ -30,6 +36,7 @@ ordering system's server design — this slice is the customer-facing client.
 
 ## Manifest
 
-`runtime-composition.manifest.ts` here is a build-only copy for externalization.
-`gigi-host` owns the canonical manifest; keep `namespace` / `externalDeps` in sync
-(or extract a shared manifest package later).
+This slice imports the **single shared manifest** from `@gigi/runtime-manifest`
+(the `gigi-manifest` package) — the same object the host uses, so there is no
+copy to drift. `createRollupExternal(manifest)` reads it to externalize React and
+`@gigi/*` specifiers at build time.

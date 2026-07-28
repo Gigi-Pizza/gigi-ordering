@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import { createRollupExternal } from "@rmc-toolkit/vite";
-import { manifest } from "./runtime-composition.manifest.js";
+import { manifest } from "@gigi/runtime-manifest";
 
 // Library build: emits a single ESM entry (index.mjs) that the host loads via
 // its import map. createRollupExternal keeps React and any @gigi/* specifiers
@@ -17,9 +17,13 @@ export default defineConfig({
       external: createRollupExternal(manifest),
     },
   },
-  // Dev server port must match environments.development.sliceOrigins.ordering
-  // in gigi-host's manifest (http://localhost:5174).
+  // The host loads this slice at @gigi/ordering/index.mjs, which its dev import
+  // map maps to http://localhost:5174/index.mjs. Only `vite preview` (serving the
+  // built dist/) has a real file there — `vite dev` serves /src/*, not /index.mjs.
+  // So `npm run serve` (build + preview on 5174) is what the host consumes; plain
+  // `npm run dev` is for editing the slice standalone.
   server: { port: 5174 },
+  preview: { port: 5174, strictPort: true },
   // Classic JSX runtime so every file uses the externalized @esm.sh/react
   // singleton (React must be in scope) rather than a bundled JSX runtime.
   esbuild: {

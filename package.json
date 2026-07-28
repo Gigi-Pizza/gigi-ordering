@@ -8,9 +8,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "serve": "vite build && vite preview --port 5174 --strictPort",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@gigi/runtime-manifest": "file:../gigi-manifest",
     "@rmc-toolkit/core": "0.5.0",
     "@rmc-toolkit/vite": "0.5.0"
   },

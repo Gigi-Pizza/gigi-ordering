@@ -25,7 +25,7 @@ export function Cart({ menu, cart, onRemove, onCheckout, onBack }: {
   return (
     <MobileShell>
       <TopBar title={t.cart} onBack={onBack} backLabel={t.back} />
-      <main className="gigi-screen-content">
+      <main className="gigi-screen-content gigi-screen-content--cart">
         {cart.lines.length === 0 ? (
           <p>{t.empty}</p>
         ) : (

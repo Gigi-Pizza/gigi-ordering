@@ -58,7 +58,7 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, onViewCart
           </Button>
         ))}
       </nav>
-      <main className="gigi-screen-content">
+      <main className="gigi-screen-content gigi-screen-content--browse">
         {items.map((item) => (
           <MenuItemCard
             key={item.id}

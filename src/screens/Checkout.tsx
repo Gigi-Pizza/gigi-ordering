@@ -29,8 +29,8 @@ export function Checkout({ onBack, onPlace }: {
   return (
     <MobileShell>
       <TopBar title={t.checkout} onBack={onBack} backLabel={t.back} />
-      <main className="gigi-customization">
-        <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
+      <main className="gigi-customization gigi-customization--checkout">
+        <form className="gigi-checkout-form" onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
           <form.Subscribe selector={(s) => s.values.mode}>
             {(mode) => (
               <React.Fragment>

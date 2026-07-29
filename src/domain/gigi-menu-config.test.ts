@@ -21,6 +21,14 @@ describe("gigiMenuConfig", () => {
       .toEqual({ pizza: 16, subs: 9, pasta: 4, extras: 5, drinks: 4 });
   });
 
+  it("gives drinks NO special-instructions (notes) group, but keeps it on pasta", () => {
+    const hasNotes = (id: string) =>
+      gigiMenuConfig.items.find((i) => i.id === id)!.definition.groups.some((g) => g.id === "notes");
+    expect(hasNotes("drink-soft")).toBe(false);
+    expect(hasNotes("drink-perrier")).toBe(false);
+    expect(hasNotes("pasta-spaghetti-meat")).toBe(true);
+  });
+
   it("defines half-and-half with two required halves and the max-base policy", () => {
     const item = gigiMenuConfig.items.find((candidate) => candidate.id === "pizza-half-and-half");
     expect(item?.definition.basePricePolicy).toEqual({

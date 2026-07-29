@@ -1,0 +1,168 @@
+{
+  "_doc": "AUTHORITATIVE GIGI menu — the single source of truth for the ordering configurator. gigi-menu-config.ts decodes this into the runtime MenuConfig. Edit menu data (items, prices, descriptions, which option groups apply, notes on/off) HERE, not in the TS. Money is integer cents (CAD).",
+
+  "priceTables": {
+    "extra1": { "S": 520, "M": 630, "L": 700, "XL": 780 },
+    "extra2": { "S": 395, "M": 445, "L": 485, "XL": 535 },
+    "subExtra": { "7": 250, "10": 275, "14": 305 }
+  },
+
+  "sizeSets": {
+    "pizza": [
+      { "id": "S", "en": "Small 10\"", "fr": "Petite 10 po" },
+      { "id": "M", "en": "Medium 12\"", "fr": "Moyenne 12 po" },
+      { "id": "L", "en": "Large 14\"", "fr": "Grande 14 po" },
+      { "id": "XL", "en": "X-Large 16\"", "fr": "Très grande 16 po" }
+    ],
+    "sub": [
+      { "id": "7", "en": "7\"", "fr": "7 po" },
+      { "id": "10", "en": "10\"", "fr": "10 po" },
+      { "id": "14", "en": "14\"", "fr": "14 po" }
+    ]
+  },
+
+  "toppingCatalogs": {
+    "extra1": {
+      "priceTable": "extra1",
+      "options": [
+        { "id": "pepperoni", "en": "Pepperoni", "fr": "Pepperoni" },
+        { "id": "bacon", "en": "Bacon", "fr": "Bacon" },
+        { "id": "capicollo", "en": "Capicollo", "fr": "Capicollo" },
+        { "id": "anchovies", "en": "Anchovies", "fr": "Anchois" },
+        { "id": "extra-cheese", "en": "Extra cheese", "fr": "Fromage supplémentaire" },
+        { "id": "steak", "en": "Steak", "fr": "Steak" }
+      ]
+    },
+    "extra2": {
+      "priceTable": "extra2",
+      "options": [
+        { "id": "mushrooms", "en": "Mushrooms", "fr": "Champignons" },
+        { "id": "green-peppers", "en": "Green peppers", "fr": "Piments verts" },
+        { "id": "onions", "en": "Onions", "fr": "Oignons" },
+        { "id": "green-olives", "en": "Green olives", "fr": "Olives vertes" },
+        { "id": "pineapple", "en": "Pineapple", "fr": "Ananas" }
+      ]
+    },
+    "subExtra": {
+      "priceTable": "subExtra",
+      "options": [
+        { "id": "extra-cheese", "en": "Extra cheese", "fr": "Fromage supplémentaire" },
+        { "id": "extra-steak", "en": "Extra steak", "fr": "Steak supplémentaire" },
+        { "id": "mushrooms", "en": "Mushrooms", "fr": "Champignons" },
+        { "id": "green-peppers", "en": "Green peppers", "fr": "Piments verts" },
+        { "id": "onions", "en": "Onions", "fr": "Oignons" }
+      ]
+    }
+  },
+
+  "templates": {
+    "sized-with-addons": {
+      "sizeSet": "pizza",
+      "multiGroups": [
+        { "id": "extra1", "en": "Add-ons", "fr": "Garnitures", "catalogs": ["extra1"] },
+        { "id": "extra2", "en": "Vegetables", "fr": "Légumes", "catalogs": ["extra2"] }
+      ],
+      "notes": true
+    },
+    "sized-simple": {
+      "sizeSet": "sub",
+      "multiGroups": [
+        { "id": "extras", "en": "Extras", "fr": "Extras", "catalogs": ["subExtra"] }
+      ],
+      "notes": true
+    },
+    "single-price": { "notes": true },
+    "beverage": { "notes": false }
+  },
+
+  "categories": [
+    {
+      "slug": "pizza",
+      "en": "Pizza",
+      "fr": "Pizza",
+      "items": [
+        { "id": "pizza-plain", "en": "Cheese", "fr": "Fromage", "template": "sized-with-addons", "prices": { "S": 1515, "M": 2045, "L": 2625, "XL": 3090 }, "descEn": "Pizza sauce and mozzarella cheese", "descFr": "Sauce à pizza et fromage mozzarella" },
+        { "id": "pizza-mushrooms", "en": "Mushrooms", "fr": "Champignons", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, mushrooms, mozzarella cheese", "descFr": "Sauce à pizza, champignons, fromage mozzarella" },
+        { "id": "pizza-green-peppers", "en": "Green Peppers", "fr": "Piments verts", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, green peppers, mozzarella cheese", "descFr": "Sauce à pizza, piments verts, fromage mozzarella" },
+        { "id": "pizza-onions", "en": "Onions", "fr": "Oignons", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, onions, mozzarella cheese", "descFr": "Sauce à pizza, oignons, fromage mozzarella" },
+        { "id": "pizza-pepperoni", "en": "Pepperoni", "fr": "Pepperoni", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, pepperoni, mozzarella cheese", "descFr": "Sauce à pizza, pepperoni, fromage mozzarella" },
+        { "id": "pizza-capicollo", "en": "Capicollo", "fr": "Capicollo", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, capicollo, mozzarella cheese", "descFr": "Sauce à pizza, capicollo, fromage mozzarella" },
+        { "id": "pizza-bacon", "en": "Bacon", "fr": "Bacon", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, bacon, mozzarella cheese", "descFr": "Sauce à pizza, bacon, fromage mozzarella" },
+        { "id": "pizza-bacon-pepperoni", "en": "Bacon + Pepperoni", "fr": "Bacon + Pepperoni", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, bacon, pepperoni, mozzarella cheese", "descFr": "Sauce à pizza, bacon, pepperoni, fromage mozzarella" },
+        { "id": "pizza-anchovies", "en": "Anchovies", "fr": "Anchois", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, anchovies, mozzarella cheese", "descFr": "Sauce à pizza, anchois, fromage mozzarella" },
+        { "id": "pizza-all-dressed", "en": "All Dressed", "fr": "Toute Garnie", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, pepperoni, mushrooms, green peppers, mozzarella cheese", "descFr": "Sauce à pizza, pepperoni, champignons, piments verts, fromage mozzarella" },
+        { "id": "pizza-hawaiian", "en": "Hawaiian", "fr": "Hawaïenne", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, pineapple, capicollo, mozzarella cheese", "descFr": "Sauce à pizza, ananas, capicollo, fromage mozzarella" },
+        { "id": "pizza-vegetarian", "en": "Vegetarian", "fr": "Végétarienne", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, mushrooms, green peppers, onions, green olives, mozzarella cheese", "descFr": "Sauce à pizza, champignons, piments verts, oignons, olives vertes, fromage mozzarella" },
+        { "id": "pizza-deluxe", "en": "Deluxe", "fr": "Deluxe", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus bacon and onions", "descFr": "Toute garnie plus bacon et oignons" },
+        { "id": "pizza-gigi", "en": "Spécial \"GIGI\"", "fr": "Spécial « GIGI »", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus steak", "descFr": "Toute garnie plus steak" },
+        { "id": "pizza-super", "en": "Pizza Super", "fr": "Pizza Super", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus bacon and green olives", "descFr": "Toute garnie plus bacon et olives vertes" }
+      ]
+    },
+    {
+      "slug": "subs",
+      "en": "Submarines",
+      "fr": "Sous-marins",
+      "defaultDescEn": "Lettuce, tomatoes, onions, oregano, \"GIGI\" special dressing and melted cheese",
+      "defaultDescFr": "Laitue, tomates, oignons, origan, vinaigrette « GIGI » et fromage fondu",
+      "items": [
+        { "id": "sub-steak-capicollo", "en": "Steak and Capicollo", "fr": "Steak / Capicollo", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-pepperoni", "en": "Steak and Pepperoni", "fr": "Steak / Pepperoni", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-green-peppers", "en": "Steak and Green Peppers", "fr": "Steak / Pim. verts", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-mushrooms", "en": "Steak and Mushrooms", "fr": "Steak / Champignons", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-steak-steak", "en": "Steak, Steak and More Steak", "fr": "Steak, Steak et Steak", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-vegetarian", "en": "Vegetarian", "fr": "Végétarien", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 }, "descEn": "Onions, green peppers, mushrooms, mozzarella cheese", "descFr": "Oignons, piments verts, champignons, fromage mozzarella" },
+        { "id": "sub-gigi", "en": "Spécial \"GIGI\"", "fr": "Spécial « GIGI »", "template": "sized-simple", "prices": { "7": 1285, "10": 1650, "14": 2065 }, "descEn": "Steak, capicollo, pepperoni, mushrooms, green peppers and melted cheese", "descFr": "Steak, capicollo, pepperoni, champignons, piments verts et fromage fondu" },
+        { "id": "sub-pepperoni", "en": "Pepperoni", "fr": "Pepperoni", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-capicollo-cheese", "en": "Capicollo and Cheese (cold)", "fr": "Capicollo Fromage (froid)", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } }
+      ]
+    },
+    {
+      "slug": "pasta",
+      "en": "Pasta",
+      "fr": "Pâtes",
+      "items": [
+        { "id": "pasta-spaghetti-meat", "en": "Spaghetti with Meat Sauce", "fr": "Spaghetti, sauce à la viande", "template": "single-price", "price": 1560 },
+        { "id": "pasta-lasagna-meat", "en": "Lasagna with Meat Sauce", "fr": "Lasagna, sauce à la viande", "template": "single-price", "price": 1560 },
+        { "id": "pasta-baked-spaghetti", "en": "Baked Spaghetti", "fr": "Spaghetti au four", "template": "single-price", "price": 1795 },
+        { "id": "pasta-baked-lasagna", "en": "Baked Lasagna", "fr": "Lasagna au four", "template": "single-price", "price": 1795 }
+      ]
+    },
+    {
+      "slug": "extras",
+      "en": "Extras",
+      "fr": "Extras",
+      "items": [
+        { "id": "extra-fries", "en": "French Fries", "fr": "Patates frites", "template": "single-price", "price": 450 },
+        { "id": "extra-fries-sauce", "en": "French Fries with Sauce", "fr": "Patates frites avec sauce", "template": "single-price", "price": 580 },
+        { "id": "extra-poutine", "en": "Poutine", "fr": "Poutine", "template": "single-price", "price": 890 },
+        { "id": "extra-italian-poutine", "en": "Italian Poutine", "fr": "Poutine italienne", "template": "single-price", "price": 1040 },
+        { "id": "extra-chef-salad", "en": "Chef's Salad", "fr": "Salade du chef", "template": "single-price", "price": 950 }
+      ]
+    },
+    {
+      "slug": "drinks",
+      "en": "Drinks",
+      "fr": "Boissons",
+      "items": [
+        { "id": "drink-soft", "en": "Soft Drinks", "fr": "Liqueurs douces", "template": "beverage", "price": 325 },
+        { "id": "drink-brio", "en": "Brio", "fr": "Brio", "template": "beverage", "price": 350 },
+        { "id": "drink-tea-coffee", "en": "Tea or Coffee", "fr": "Thé ou café", "template": "beverage", "price": 250 },
+        { "id": "drink-perrier", "en": "Perrier", "fr": "Perrier", "template": "beverage", "price": 410 }
+      ]
+    }
+  ],
+
+  "halfAndHalf": {
+    "id": "pizza-half-and-half",
+    "category": "pizza",
+    "en": "Half & Half",
+    "fr": "Moitié-moitié",
+    "descEn": "Two pizzas in one — choose a flavour for each half",
+    "descFr": "Deux pizzas en une — choisissez une saveur par moitié",
+    "sizeSet": "pizza",
+    "toppingDivisor": 1,
+    "extraCatalogs": ["extra1", "extra2"],
+    "left": { "id": "halfLeft", "en": "Left half", "fr": "Moitié gauche", "extraId": "extraLeft", "extraEn": "Left-half extras", "extraFr": "Extras — moitié gauche" },
+    "right": { "id": "halfRight", "en": "Right half", "fr": "Moitié droite", "extraId": "extraRight", "extraEn": "Right-half extras", "extraFr": "Extras — moitié droite" }
+  }
+}

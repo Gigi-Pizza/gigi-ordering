@@ -1,226 +1,154 @@
 import { Schema } from "@esm.sh/effect";
-import { MenuConfig, type MenuConfigT, type OptionGroupT, type OptionT } from "./config-schema";
+import { MenuConfig, type MenuConfigT, type OptionGroupT, type OptionT, type BilingualT } from "./config-schema";
+import seed from "./menu.seed.json";
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-const bi = (en: string, fr: string) => ({ en, fr });
+/**
+ * The GIGI menu is defined as DATA in `menu.seed.json` (the single source of
+ * truth). This module is a thin decoder: it reads that seed, assembles the
+ * runtime `MenuConfig` (resolving templates + topping catalogs into concrete
+ * option groups), and validates the result against the schema. To change the
+ * menu — prices, items, descriptions, which groups apply, whether an item has a
+ * "special instructions" field — edit the JSON, not this file.
+ */
 
-type SizeDef = { id: string; label: { en: string; fr: string } };
-const PIZZA_SIZES: SizeDef[] = [
-  { id: "S", label: bi('Small 10"', "Petite 10 po") },
-  { id: "M", label: bi('Medium 12"', "Moyenne 12 po") },
-  { id: "L", label: bi('Large 14"', "Grande 14 po") },
-  { id: "XL", label: bi('X-Large 16"', "Très grande 16 po") },
-];
-const SUB_SIZES: SizeDef[] = [
-  { id: "7", label: bi('7"', "7 po") },
-  { id: "10", label: bi('10"', "10 po") },
-  { id: "14", label: bi('14"', "14 po") },
-];
-
-// Derived upcharges (spec §9.1), per size.
-const EXTRA1 = { S: 520, M: 630, L: 700, XL: 780 };
-const EXTRA2 = { S: 395, M: 445, L: 485, XL: 535 };
-const SUB_EXTRA = { "7": 250, "10": 275, "14": 305 };
-
-const sizeGroup = (sizes: SizeDef[]): OptionGroupT => ({
-  kind: "single", id: "size", label: bi("Size", "Format"), required: true,
-  options: sizes.map((s): OptionT => ({ id: s.id, label: s.label, price: { kind: "flat", cents: 0 } })),
-});
-
-const multiGroup = (
-  id: string, en: string, fr: string,
-  opts: { id: string; en: string; fr: string; table: Record<string, number> }[],
-): OptionGroupT => ({
-  kind: "multi", id, label: bi(en, fr), min: 0, max: 12,
-  options: opts.map((o): OptionT => ({ id: o.id, label: bi(o.en, o.fr), price: { kind: "bySize", table: o.table } })),
-});
-
-const notes: OptionGroupT = {
-  kind: "text", id: "notes", label: bi("Special instructions", "Instructions spéciales"), required: false, maxLength: 200,
+// ── raw seed shape (validated structurally by the final MenuConfig decode;
+//    these types just make the assembly below type-safe) ──────────────────────
+type Cents = number;
+type PriceTable = Record<string, Cents>;
+type SizeDef = { id: string; en: string; fr: string };
+type CatalogOpt = { id: string; en: string; fr: string };
+type Catalog = { priceTable: string; options: CatalogOpt[] };
+type MultiDef = { id: string; en: string; fr: string; catalogs: string[] };
+type TemplateDef = { sizeSet?: string; multiGroups?: MultiDef[]; notes: boolean };
+type ItemDef = {
+  id: string; en: string; fr: string; template: string;
+  prices?: PriceTable; price?: Cents; descEn?: string; descFr?: string;
+};
+type CategoryDef = {
+  slug: string; en: string; fr: string;
+  defaultDescEn?: string; defaultDescFr?: string; items: ItemDef[];
+};
+type HalfSideDef = { id: string; en: string; fr: string; extraId: string; extraEn: string; extraFr: string };
+type HalfDef = {
+  id: string; category: string; en: string; fr: string; descEn: string; descFr: string;
+  sizeSet: string; toppingDivisor: number; extraCatalogs: string[]; left: HalfSideDef; right: HalfSideDef;
+};
+type Seed = {
+  priceTables: Record<string, PriceTable>;
+  sizeSets: Record<string, SizeDef[]>;
+  toppingCatalogs: Record<string, Catalog>;
+  templates: Record<string, TemplateDef>;
+  categories: CategoryDef[];
+  halfAndHalf: HalfDef;
 };
 
-const EXTRA1_OPTS = [
-  { id: "pepperoni", en: "Pepperoni", fr: "Pepperoni", table: EXTRA1 },
-  { id: "bacon", en: "Bacon", fr: "Bacon", table: EXTRA1 },
-  { id: "capicollo", en: "Capicollo", fr: "Capicollo", table: EXTRA1 },
-  { id: "anchovies", en: "Anchovies", fr: "Anchois", table: EXTRA1 },
-  { id: "extra-cheese", en: "Extra cheese", fr: "Fromage supplémentaire", table: EXTRA1 },
-  // George 2026-07-29: steak is an Extra-1-tier pizza topping.
-  { id: "steak", en: "Steak", fr: "Steak", table: EXTRA1 },
-];
-const EXTRA2_OPTS = [
-  { id: "mushrooms", en: "Mushrooms", fr: "Champignons", table: EXTRA2 },
-  { id: "green-peppers", en: "Green peppers", fr: "Piments verts", table: EXTRA2 },
-  { id: "onions", en: "Onions", fr: "Oignons", table: EXTRA2 },
-  { id: "green-olives", en: "Green olives", fr: "Olives vertes", table: EXTRA2 },
-  // George 2026-07-29: pineapple is an Extra-2-tier pizza topping.
-  { id: "pineapple", en: "Pineapple", fr: "Ananas", table: EXTRA2 },
-];
+const raw = seed as unknown as Seed;
+const bi = (en: string, fr: string): BilingualT => ({ en, fr });
 
-// George still needs to confirm whether half-pizza toppings receive a partial
-// upcharge. Keep this as one explicit switch; 1 = the recommended full charge.
-export const HALF_TOPPING_PRICE_DIVISOR = 1;
-const halfToppingTable = (table: Record<string, number>): Record<string, number> =>
-  Object.fromEntries(Object.entries(table).map(([size, cents]) => [size, Math.round(cents / HALF_TOPPING_PRICE_DIVISOR)]));
-const HALF_EXTRA_OPTS = [...EXTRA1_OPTS, ...EXTRA2_OPTS].map((option) => ({
-  ...option,
-  table: halfToppingTable(option.table),
-}));
-const SUB_EXTRA_OPTS = [
-  { id: "extra-cheese", en: "Extra cheese", fr: "Fromage supplémentaire", table: SUB_EXTRA },
-  { id: "extra-steak", en: "Extra steak", fr: "Steak supplémentaire", table: SUB_EXTRA },
-  { id: "mushrooms", en: "Mushrooms", fr: "Champignons", table: SUB_EXTRA },
-  { id: "green-peppers", en: "Green peppers", fr: "Piments verts", table: SUB_EXTRA },
-  { id: "onions", en: "Onions", fr: "Oignons", table: SUB_EXTRA },
-];
-
-type Item = MenuConfigT["items"][number];
-
-// Ingredient lines are the bilingual descriptions from the authoritative 2025
-// menu digitization (resources/menu/menu.seed.json).
-const pizza = (
-  id: string, en: string, fr: string, base: Record<string, number>,
-  descEn: string, descFr: string,
-): Item => ({
-  id, name: bi(en, fr), category: "pizza", description: bi(descEn, descFr),
-  definition: {
-    templateId: "sized-with-addons",
-    basePrice: { kind: "bySize", table: base },
-    groups: [sizeGroup(PIZZA_SIZES), multiGroup("extra1", "Add-ons", "Garnitures", EXTRA1_OPTS), multiGroup("extra2", "Vegetables", "Légumes", EXTRA2_OPTS), notes],
-  },
-});
-
-// Every submarine carries the same GIGI garnish beyond its named filling; a few
-// have their own ingredient line in the seed. Pass those; default to the garnish.
-const SUB_GARNISH_EN = 'Lettuce, tomatoes, onions, oregano, "GIGI" special dressing and melted cheese';
-const SUB_GARNISH_FR = "Laitue, tomates, oignons, origan, vinaigrette « GIGI » et fromage fondu";
-const sub = (
-  id: string, en: string, fr: string, base: Record<string, number>,
-  descEn: string = SUB_GARNISH_EN, descFr: string = SUB_GARNISH_FR,
-): Item => ({
-  id, name: bi(en, fr), category: "subs", description: bi(descEn, descFr),
-  definition: {
-    templateId: "sized-simple",
-    basePrice: { kind: "bySize", table: base },
-    groups: [sizeGroup(SUB_SIZES), multiGroup("extras", "Extras", "Extras", SUB_EXTRA_OPTS), notes],
-  },
-});
-
-const flat = (id: string, en: string, fr: string, category: string, cents: number): Item => ({
-  id, name: bi(en, fr), category,
-  definition: { templateId: "single-price", basePrice: { kind: "flat", cents }, groups: [notes] },
-});
-
-const PIZZA_ITEMS: Item[] = [
-  pizza("pizza-plain", "Cheese", "Fromage", { S: 1515, M: 2045, L: 2625, XL: 3090 },
-    "Pizza sauce and mozzarella cheese", "Sauce à pizza et fromage mozzarella"),
-  pizza("pizza-mushrooms", "Mushrooms", "Champignons", { S: 1680, M: 2385, L: 3005, XL: 3440 },
-    "Pizza sauce, mushrooms, mozzarella cheese", "Sauce à pizza, champignons, fromage mozzarella"),
-  pizza("pizza-green-peppers", "Green Peppers", "Piments verts", { S: 1680, M: 2385, L: 3005, XL: 3440 },
-    "Pizza sauce, green peppers, mozzarella cheese", "Sauce à pizza, piments verts, fromage mozzarella"),
-  pizza("pizza-onions", "Onions", "Oignons", { S: 1680, M: 2385, L: 3005, XL: 3440 },
-    "Pizza sauce, onions, mozzarella cheese", "Sauce à pizza, oignons, fromage mozzarella"),
-  pizza("pizza-pepperoni", "Pepperoni", "Pepperoni", { S: 1730, M: 2505, L: 3220, XL: 3665 },
-    "Pizza sauce, pepperoni, mozzarella cheese", "Sauce à pizza, pepperoni, fromage mozzarella"),
-  pizza("pizza-capicollo", "Capicollo", "Capicollo", { S: 1730, M: 2505, L: 3220, XL: 3665 },
-    "Pizza sauce, capicollo, mozzarella cheese", "Sauce à pizza, capicollo, fromage mozzarella"),
-  pizza("pizza-bacon", "Bacon", "Bacon", { S: 1730, M: 2505, L: 3220, XL: 3665 },
-    "Pizza sauce, bacon, mozzarella cheese", "Sauce à pizza, bacon, fromage mozzarella"),
-  pizza("pizza-bacon-pepperoni", "Bacon + Pepperoni", "Bacon + Pepperoni", { S: 1855, M: 2620, L: 3430, XL: 4170 },
-    "Pizza sauce, bacon, pepperoni, mozzarella cheese", "Sauce à pizza, bacon, pepperoni, fromage mozzarella"),
-  pizza("pizza-anchovies", "Anchovies", "Anchois", { S: 1730, M: 2505, L: 3220, XL: 3665 },
-    "Pizza sauce, anchovies, mozzarella cheese", "Sauce à pizza, anchois, fromage mozzarella"),
-  pizza("pizza-all-dressed", "All Dressed", "Toute Garnie", { S: 1855, M: 2620, L: 3430, XL: 4170 },
-    "Pizza sauce, pepperoni, mushrooms, green peppers, mozzarella cheese",
-    "Sauce à pizza, pepperoni, champignons, piments verts, fromage mozzarella"),
-  pizza("pizza-hawaiian", "Hawaiian", "Hawaïenne", { S: 1855, M: 2620, L: 3430, XL: 4170 },
-    "Pizza sauce, pineapple, capicollo, mozzarella cheese", "Sauce à pizza, ananas, capicollo, fromage mozzarella"),
-  pizza("pizza-vegetarian", "Vegetarian", "Végétarienne", { S: 1855, M: 2620, L: 3430, XL: 4170 },
-    "Pizza sauce, mushrooms, green peppers, onions, green olives, mozzarella cheese",
-    "Sauce à pizza, champignons, piments verts, oignons, olives vertes, fromage mozzarella"),
-  pizza("pizza-deluxe", "Deluxe", "Deluxe", { S: 2100, M: 2870, L: 3970, XL: 4760 },
-    "All Dressed plus bacon and onions", "Toute garnie plus bacon et oignons"),
-  pizza("pizza-gigi", 'Spécial "GIGI"', "Spécial « GIGI »", { S: 2100, M: 2870, L: 3970, XL: 4760 },
-    "All Dressed plus steak", "Toute garnie plus steak"),
-  pizza("pizza-super", "Pizza Super", "Pizza Super", { S: 2100, M: 2870, L: 3970, XL: 4760 },
-    "All Dressed plus bacon and green olives", "Toute garnie plus bacon et olives vertes"),
-];
-
-const halfPizzaOptions: OptionT[] = PIZZA_ITEMS.map((item) => ({
-  id: item.id,
-  label: item.name,
-  price: item.definition.basePrice,
-}));
-
-const halfGroup = (id: string, en: string, fr: string): OptionGroupT => ({
-  kind: "single",
-  id,
-  label: bi(en, fr),
-  required: true,
-  options: halfPizzaOptions,
-});
-
-const HALF_AND_HALF_ITEM: Item = {
-  id: "pizza-half-and-half",
-  name: bi("Half & Half", "Moitié-moitié"),
-  category: "pizza",
-  description: bi("Two pizzas in one — choose a flavour for each half", "Deux pizzas en une — choisissez une saveur par moitié"),
-  definition: {
-    templateId: "half-and-half",
-    basePrice: { kind: "flat", cents: 0 },
-    basePricePolicy: { kind: "maxOfSingleGroups", groupIds: ["halfLeft", "halfRight"] },
-    groups: [
-      sizeGroup(PIZZA_SIZES),
-      halfGroup("halfLeft", "Left half", "Moitié gauche"),
-      halfGroup("halfRight", "Right half", "Moitié droite"),
-      multiGroup("extraLeft", "Left-half extras", "Extras — moitié gauche", HALF_EXTRA_OPTS),
-      multiGroup("extraRight", "Right-half extras", "Extras — moitié droite", HALF_EXTRA_OPTS),
-      notes,
-    ],
-  },
+// Named lookups that fail loudly if the seed references something undefined.
+const need = <T,>(map: Record<string, T>, key: string, kind: string): T => {
+  const v = map[key];
+  if (v === undefined) throw new Error(`menu.seed.json: unknown ${kind} "${key}"`);
+  return v;
 };
 
-// ── Gigi 2025 config ─────────────────────────────────────────────────────────
-const raw: MenuConfigT = {
-  templates: [
-    { id: "sized-with-addons", groups: [sizeGroup(PIZZA_SIZES), multiGroup("extra1", "Add-ons", "Garnitures", EXTRA1_OPTS), multiGroup("extra2", "Vegetables", "Légumes", EXTRA2_OPTS), notes] },
-    { id: "sized-simple", groups: [sizeGroup(SUB_SIZES), multiGroup("extras", "Extras", "Extras", SUB_EXTRA_OPTS), notes] },
-    { id: "single-price", groups: [notes] },
-    { id: "variant", groups: [] },
-  ],
-  items: [
-    ...PIZZA_ITEMS,
-    HALF_AND_HALF_ITEM,
-
-    sub("sub-steak-capicollo", "Steak and Capicollo", "Steak / Capicollo", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-steak-pepperoni", "Steak and Pepperoni", "Steak / Pepperoni", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-steak-green-peppers", "Steak and Green Peppers", "Steak / Pim. verts", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-steak-mushrooms", "Steak and Mushrooms", "Steak / Champignons", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-steak-steak-steak", "Steak, Steak and More Steak", "Steak, Steak et Steak", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-vegetarian", "Vegetarian", "Végétarien", { "7": 1165, "10": 1515, "14": 1890 },
-      "Onions, green peppers, mushrooms, mozzarella cheese", "Oignons, piments verts, champignons, fromage mozzarella"),
-    sub("sub-gigi", 'Spécial "GIGI"', "Spécial « GIGI »", { "7": 1285, "10": 1650, "14": 2065 },
-      "Steak, capicollo, pepperoni, mushrooms, green peppers and melted cheese",
-      "Steak, capicollo, pepperoni, champignons, piments verts et fromage fondu"),
-    sub("sub-pepperoni", "Pepperoni", "Pepperoni", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-capicollo-cheese", "Capicollo and Cheese (cold)", "Capicollo Fromage (froid)", { "7": 1165, "10": 1515, "14": 1890 }),
-
-    flat("pasta-spaghetti-meat", "Spaghetti with Meat Sauce", "Spaghetti, sauce à la viande", "pasta", 1560),
-    flat("pasta-lasagna-meat", "Lasagna with Meat Sauce", "Lasagna, sauce à la viande", "pasta", 1560),
-    flat("pasta-baked-spaghetti", "Baked Spaghetti", "Spaghetti au four", "pasta", 1795),
-    flat("pasta-baked-lasagna", "Baked Lasagna", "Lasagna au four", "pasta", 1795),
-
-    flat("extra-fries", "French Fries", "Patates frites", "extras", 450),
-    flat("extra-fries-sauce", "French Fries with Sauce", "Patates frites avec sauce", "extras", 580),
-    flat("extra-poutine", "Poutine", "Poutine", "extras", 890),
-    flat("extra-italian-poutine", "Italian Poutine", "Poutine italienne", "extras", 1040),
-    flat("extra-chef-salad", "Chef's Salad", "Salade du chef", "extras", 950),
-
-    flat("drink-soft", "Soft Drinks", "Liqueurs douces", "drinks", 325),
-    flat("drink-brio", "Brio", "Brio", "drinks", 350),
-    flat("drink-tea-coffee", "Tea or Coffee", "Thé ou café", "drinks", 250),
-    flat("drink-perrier", "Perrier", "Perrier", "drinks", 410),
-  ],
+// Reusable "special instructions" free-text group (added only when a template
+// opts in via `notes: true`).
+const notesGroup: OptionGroupT = {
+  kind: "text", id: "notes", label: bi("Special instructions", "Instructions spéciales"),
+  required: false, maxLength: 200,
 };
 
-export const gigiMenuConfig: MenuConfigT = Schema.decodeUnknownSync(MenuConfig)(raw);
+function sizeGroupFrom(sizeSetName: string): OptionGroupT {
+  const sizes = need(raw.sizeSets, sizeSetName, "sizeSet");
+  return {
+    kind: "single", id: "size", label: bi("Size", "Format"), required: true,
+    options: sizes.map((s): OptionT => ({ id: s.id, label: bi(s.en, s.fr), price: { kind: "flat", cents: 0 } })),
+  };
+}
+
+// Options drawn from one or more topping catalogs. Each catalog carries its own
+// per-size price table; `divisor` supports half-price toppings (1 = full price).
+function optionsFromCatalogs(catalogNames: string[], divisor = 1): OptionT[] {
+  return catalogNames.flatMap((name) => {
+    const catalog = need(raw.toppingCatalogs, name, "toppingCatalog");
+    const table = need(raw.priceTables, catalog.priceTable, "priceTable");
+    const scaled = divisor === 1
+      ? table
+      : Object.fromEntries(Object.entries(table).map(([size, cents]) => [size, Math.round(cents / divisor)]));
+    return catalog.options.map((o): OptionT => ({ id: o.id, label: bi(o.en, o.fr), price: { kind: "bySize", table: scaled } }));
+  });
+}
+
+function multiGroupFrom(def: MultiDef, divisor = 1): OptionGroupT {
+  return { kind: "multi", id: def.id, label: bi(def.en, def.fr), min: 0, max: 12, options: optionsFromCatalogs(def.catalogs, divisor) };
+}
+
+function templateGroups(t: TemplateDef): OptionGroupT[] {
+  const groups: OptionGroupT[] = [];
+  if (t.sizeSet) groups.push(sizeGroupFrom(t.sizeSet));
+  for (const m of t.multiGroups ?? []) groups.push(multiGroupFrom(m));
+  if (t.notes) groups.push(notesGroup);
+  return groups;
+}
+
+type BuiltItem = MenuConfigT["items"][number];
+
+function buildItem(it: ItemDef, cat: CategoryDef): BuiltItem {
+  const t = need(raw.templates, it.template, "template");
+  const basePrice = t.sizeSet
+    ? { kind: "bySize" as const, table: need2(it.prices, it.id, "prices") }
+    : { kind: "flat" as const, cents: need2(it.price, it.id, "price") };
+  const descEn = it.descEn ?? cat.defaultDescEn;
+  const descFr = it.descFr ?? cat.defaultDescFr;
+  const item: BuiltItem = {
+    id: it.id, name: bi(it.en, it.fr), category: cat.slug,
+    ...(descEn !== undefined && descFr !== undefined ? { description: bi(descEn, descFr) } : {}),
+    definition: { templateId: it.template, basePrice, groups: templateGroups(t) },
+  };
+  return item;
+}
+
+// Required item field (prices for sized items, price for flat items).
+function need2<T>(v: T | undefined, itemId: string, field: string): T {
+  if (v === undefined) throw new Error(`menu.seed.json: item "${itemId}" is missing "${field}"`);
+  return v;
+}
+
+// Half & half is assembled from the pizza items (each half is a whole pizza's
+// base price) plus per-half extra groups — this derivation stays in code so the
+// half options never drift from the pizza list.
+function buildHalfAndHalf(pizzaItems: BuiltItem[]): BuiltItem {
+  const h = raw.halfAndHalf;
+  const halfOptions: OptionT[] = pizzaItems.map((p) => ({ id: p.id, label: p.name, price: p.definition.basePrice }));
+  const halfGroup = (side: HalfSideDef): OptionGroupT => ({
+    kind: "single", id: side.id, label: bi(side.en, side.fr), required: true, options: halfOptions,
+  });
+  const extraGroup = (side: HalfSideDef): OptionGroupT => ({
+    kind: "multi", id: side.extraId, label: bi(side.extraEn, side.extraFr), min: 0, max: 12,
+    options: optionsFromCatalogs(h.extraCatalogs, h.toppingDivisor),
+  });
+  return {
+    id: h.id, name: bi(h.en, h.fr), category: h.category, description: bi(h.descEn, h.descFr),
+    definition: {
+      templateId: "half-and-half",
+      basePrice: { kind: "flat", cents: 0 },
+      basePricePolicy: { kind: "maxOfSingleGroups", groupIds: [h.left.id, h.right.id] },
+      groups: [sizeGroupFrom(h.sizeSet), halfGroup(h.left), halfGroup(h.right), extraGroup(h.left), extraGroup(h.right), notesGroup],
+    },
+  };
+}
+
+function buildConfig(): MenuConfigT {
+  const items: BuiltItem[] = [];
+  for (const cat of raw.categories) {
+    const built = cat.items.map((it) => buildItem(it, cat));
+    items.push(...built);
+    // Insert the half & half item right after its category's items (pizza).
+    if (cat.slug === raw.halfAndHalf.category) items.push(buildHalfAndHalf(built));
+  }
+  const templates = Object.entries(raw.templates).map(([id, t]) => ({ id, groups: templateGroups(t) }));
+  return Schema.decodeUnknownSync(MenuConfig)({ templates, items });
+}
+
+export const gigiMenuConfig: MenuConfigT = buildConfig();

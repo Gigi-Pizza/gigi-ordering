@@ -22,7 +22,7 @@ type MultiDef = { id: string; en: string; fr: string; catalogs: string[] };
 type TemplateDef = { sizeSet?: string; multiGroups?: MultiDef[]; notes: boolean };
 type ItemDef = {
   id: string; en: string; fr: string; template: string;
-  prices?: PriceTable; price?: Cents; descEn?: string; descFr?: string;
+  prices?: PriceTable; price?: Cents; descEn?: string; descFr?: string; image?: string;
 };
 type CategoryDef = {
   slug: string; en: string; fr: string;
@@ -30,7 +30,7 @@ type CategoryDef = {
 };
 type HalfSideDef = { id: string; en: string; fr: string; extraId: string; extraEn: string; extraFr: string };
 type HalfDef = {
-  id: string; category: string; en: string; fr: string; descEn: string; descFr: string;
+  id: string; category: string; en: string; fr: string; descEn: string; descFr: string; image?: string;
   sizeSet: string; toppingDivisor: number; extraCatalogs: string[]; left: HalfSideDef; right: HalfSideDef;
 };
 type Seed = {
@@ -104,6 +104,7 @@ function buildItem(it: ItemDef, cat: CategoryDef): BuiltItem {
   const item: BuiltItem = {
     id: it.id, name: bi(it.en, it.fr), category: cat.slug,
     ...(descEn !== undefined && descFr !== undefined ? { description: bi(descEn, descFr) } : {}),
+    ...(it.image !== undefined ? { image: it.image } : {}),
     definition: { templateId: it.template, basePrice, groups: templateGroups(t) },
   };
   return item;
@@ -130,6 +131,7 @@ function buildHalfAndHalf(pizzaItems: BuiltItem[]): BuiltItem {
   });
   return {
     id: h.id, name: bi(h.en, h.fr), category: h.category, description: bi(h.descEn, h.descFr),
+    ...(h.image !== undefined ? { image: h.image } : {}),
     definition: {
       templateId: "half-and-half",
       basePrice: { kind: "flat", cents: 0 },

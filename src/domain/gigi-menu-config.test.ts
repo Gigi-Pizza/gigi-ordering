@@ -21,6 +21,12 @@ describe("gigiMenuConfig", () => {
       .toEqual({ pizza: 16, subs: 9, pasta: 4, extras: 5, drinks: 16 });
   });
 
+  it("carries an image path on items from the seed", () => {
+    const cheese = gigiMenuConfig.items.find((i) => i.id === "pizza-plain");
+    expect(cheese?.image).toBe("/images/menu/pizza-plain.webp");
+    expect(gigiMenuConfig.items.every((i) => typeof i.image === "string" && i.image.length > 0)).toBe(true);
+  });
+
   it("gives drinks NO special-instructions (notes) group, but keeps it on pasta", () => {
     const hasNotes = (id: string) =>
       gigiMenuConfig.items.find((i) => i.id === id)!.definition.groups.some((g) => g.id === "notes");

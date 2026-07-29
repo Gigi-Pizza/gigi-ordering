@@ -49,6 +49,8 @@ export const MenuItem = Schema.Struct({
   // Ingredient / composition line shown on the selection page (optional — flat
   // items like drinks don't need one).
   description: Schema.optional(Bilingual),
+  // Path to the item's image (optional; site-relative, e.g. "/images/menu/pizza-plain.webp").
+  image: Schema.optional(Schema.String),
   definition: ItemDefinition,
 });
 export type MenuItemT = Schema.Schema.Type<typeof MenuItem>;

@@ -34,14 +34,16 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, cartQuanti
 
   return (
     <MobileShell>
-      <header className="gigi-ordering-head"><h1>{t.title}</h1></header>
-      <nav className="gigi-category-tabs" aria-label="Categories">
-        {CATEGORIES.map((c) => (
-          <Button key={c} variant={c === activeCat ? "primary" : "subtle"} size="small" onClick={() => onCat(c)}>
-            {t.cats[c]}
-          </Button>
-        ))}
-      </nav>
+      <div className="gigi-ordering-tabsbar">
+        <h1 className="gigi-ordering-title">{t.title}</h1>
+        <nav className="gigi-category-tabs" aria-label="Categories">
+          {CATEGORIES.map((c) => (
+            <Button key={c} variant={c === activeCat ? "primary" : "subtle"} size="small" onClick={() => onCat(c)}>
+              {t.cats[c]}
+            </Button>
+          ))}
+        </nav>
+      </div>
       <main className="gigi-screen-content gigi-screen-content--browse">
         {items.map((item) => {
           const quantityInCart = cartQuantities[item.id] ?? 0;

@@ -33,3 +33,10 @@ export function updateQuantity(cart: Cart, lineId: string, quantity: number, uni
   );
   return { lines, subtotalCents: subtotal(lines) };
 }
+
+export function quantitiesByItem(cart: Cart): Record<string, number> {
+  return cart.lines.reduce<Record<string, number>>((quantities, line) => {
+    quantities[line.itemId] = (quantities[line.itemId] ?? 0) + line.quantity;
+    return quantities;
+  }, {});
+}

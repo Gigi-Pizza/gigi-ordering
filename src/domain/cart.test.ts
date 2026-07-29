@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { emptyCart, addLine, removeLine, updateQuantity, type ConfiguredItem } from "./cart";
+import { emptyCart, addLine, quantitiesByItem, removeLine, updateQuantity, type ConfiguredItem } from "./cart";
 
 const line = (lineId: string, unit: number, qty: number): ConfiguredItem => ({
   lineId, itemId: "pizza-plain", selection: { size: "M", groups: {} },
@@ -21,5 +21,10 @@ describe("cart", () => {
     const c = removeLine(addLine(emptyCart(), line("a", 2045, 1)), "a");
     expect(c.lines).toHaveLength(0);
     expect(c.subtotalCents).toBe(0);
+  });
+  it("sums quantities by menu item across separately configured lines", () => {
+    const other = { ...line("c", 1500, 2), itemId: "sub-steak" };
+    const cart = addLine(addLine(addLine(emptyCart(), line("a", 2045, 1)), line("b", 2045, 2)), other);
+    expect(quantitiesByItem(cart)).toEqual({ "pizza-plain": 3, "sub-steak": 2 });
   });
 });

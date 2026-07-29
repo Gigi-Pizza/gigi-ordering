@@ -20,12 +20,13 @@ function fromPrice(item: MenuItemT, lang: "en" | "fr"): string {
   return money(cents, lang);
 }
 
-export function Browse({ menu, activeCat, onCat, onSelect, cartCount, onViewCart }: {
+export function Browse({ menu, activeCat, onCat, onSelect, cartCount, cartQuantities, onViewCart }: {
   menu: MenuConfigT;
   activeCat: string;
   onCat: (c: string) => void;
   onSelect: (item: MenuItemT) => void;
   cartCount: number;
+  cartQuantities: Readonly<Record<string, number>>;
   onViewCart: () => void;
 }): React.ReactElement {
   const { t, lang } = useOrderingCopy();
@@ -42,16 +43,20 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, onViewCart
         ))}
       </nav>
       <main className="gigi-screen-content gigi-screen-content--browse">
-        {items.map((item) => (
-          <MenuItemCard
-            key={item.id}
-            heading={pick(item.name, lang)}
-            description={item.description ? pick(item.description, lang) : ""}
-            price={`${t.from} ${fromPrice(item, lang)}`}
-            actionLabel={t.select}
-            onAction={() => onSelect(item)}
-          />
-        ))}
+        {items.map((item) => {
+          const quantityInCart = cartQuantities[item.id] ?? 0;
+          return (
+            <MenuItemCard
+              key={item.id}
+              heading={pick(item.name, lang)}
+              description={item.description ? pick(item.description, lang) : ""}
+              price={`${t.from} ${fromPrice(item, lang)}`}
+              statusLabel={quantityInCart > 0 ? t.inOrder(quantityInCart) : undefined}
+              actionLabel={quantityInCart > 0 ? t.addAnother : t.select}
+              onAction={() => onSelect(item)}
+            />
+          );
+        })}
       </main>
       {cartCount > 0 && <StickyAction onClick={onViewCart}>{t.viewCart} · {cartCount}</StickyAction>}
     </MobileShell>

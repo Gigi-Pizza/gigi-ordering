@@ -9,6 +9,7 @@ import { Cart } from "./screens/Cart";
 import { Checkout } from "./screens/Checkout";
 import { Placeholder } from "./screens/Placeholder";
 import { useOrderingCopy } from "./copy";
+import { quantitiesByItem } from "./domain/cart";
 
 /**
  * gigi-ordering slice — the config-driven ordering configurator.
@@ -24,6 +25,8 @@ export default function OrderingSlice(_props: { context?: RuntimeModuleContext }
   const [snapshot, send] = useMachine(flowMachine, { input: { menu: gigiMenuConfig } });
   const ctx = snapshot.context;
   const value = snapshot.value as string;
+  const cartQuantities = quantitiesByItem(ctx.cart);
+  const cartCount = Object.values(cartQuantities).reduce((total, quantity) => total + quantity, 0);
 
   if (value === "configuringItem" && ctx.selectedItem) {
     return (
@@ -62,7 +65,7 @@ export default function OrderingSlice(_props: { context?: RuntimeModuleContext }
   }
 
   if (value === "confirmed") {
-    return <Placeholder title={t.confirmed} message={t.confirmed} detail={JSON.stringify(ctx.order, null, 2)} />;
+    return <Placeholder title={t.confirmed} message={t.confirmedBody} />;
   }
 
   return (
@@ -71,7 +74,8 @@ export default function OrderingSlice(_props: { context?: RuntimeModuleContext }
       activeCat={activeCat}
       onCat={setActiveCat}
       onSelect={(item) => send({ type: "SELECT_ITEM", item })}
-      cartCount={ctx.cart.lines.length}
+      cartCount={cartCount}
+      cartQuantities={cartQuantities}
       onViewCart={() => send({ type: "VIEW_CART" })}
     />
   );

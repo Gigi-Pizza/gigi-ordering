@@ -133,7 +133,7 @@ React API:
 
 | Prop | Type | Behavior |
 |---|---|---|
-| `options` | `readonly { id: string; label: ReactNode }[]` | Choices displayed as buttons |
+| `options` | `readonly { id: string; label: ReactNode; price?: ReactNode }[]` | Choices displayed as buttons; pass `price` separately (keep currency OUT of `label`) so it can align/wrap responsively |
 | `selectedIds` | `readonly string[]` | Controlled selected state |
 | `onSelect` | `(optionId: string) => void` | Reports a pressed choice |
 | `columns` | `1 \| 2` | Standard stack or compact two-column grid |
@@ -194,7 +194,7 @@ Use existing Gigi variables:
 - 18px mobile screen gutter
 - 48px compact and 52px primary control heights
 
-The responsive baseline is a 390 × 844 mobile viewport. On wider screens, retain the established centered mobile-shell behavior unless the broader ordering application defines a desktop layout.
+The mobile baseline is a 390-px-wide viewport. NOTE: the ordering application now DEFINES a full-viewport desktop layout — see §18. The shell is full-width with **no border or corner radius at any breakpoint** (it is not a centered device mockup); content is centered by an inner max-width rail on wide screens. Design to §18, not to a fixed 390 × 844 framed shell.
 
 ---
 

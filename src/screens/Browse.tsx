@@ -65,7 +65,7 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, onViewCart
             heading={displayName(item, lang)}
             description={item.description ? pick(item.description, lang) : ""}
             price={`${t.from} ${fromPrice(item, lang)}`}
-            actionLabel={t.customize}
+            actionLabel={t.select}
             onAction={() => onSelect(item)}
           />
         ))}

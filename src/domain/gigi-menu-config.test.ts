@@ -15,9 +15,20 @@ describe("gigiMenuConfig", () => {
     expect(pizza!.definition.groups.some((g) => g.id === "size" && g.kind === "single")).toBe(true);
   });
 
-  it("covers all 37 items across the five categories", () => {
+  it("covers all 38 items across the five categories", () => {
     const byCat = (c: string) => gigiMenuConfig.items.filter((i) => i.category === c).length;
     expect({ pizza: byCat("pizza"), subs: byCat("subs"), pasta: byCat("pasta"), extras: byCat("extras"), drinks: byCat("drinks") })
-      .toEqual({ pizza: 15, subs: 9, pasta: 4, extras: 5, drinks: 4 });
+      .toEqual({ pizza: 16, subs: 9, pasta: 4, extras: 5, drinks: 4 });
+  });
+
+  it("defines half-and-half with two required halves and the max-base policy", () => {
+    const item = gigiMenuConfig.items.find((candidate) => candidate.id === "pizza-half-and-half");
+    expect(item?.definition.basePricePolicy).toEqual({
+      kind: "maxOfSingleGroups",
+      groupIds: ["halfLeft", "halfRight"],
+    });
+    expect(item?.definition.groups.filter((group) =>
+      (group.id === "halfLeft" || group.id === "halfRight") && group.kind === "single" && group.required,
+    )).toHaveLength(2);
   });
 });

@@ -4,6 +4,7 @@ import { itemConfigMachine } from "./item-config.machine";
 import { gigiMenuConfig } from "../domain/gigi-menu-config";
 
 const plain = gigiMenuConfig.items.find((i) => i.id === "pizza-plain")!;
+const halfAndHalf = gigiMenuConfig.items.find((i) => i.id === "pizza-half-and-half")!;
 
 describe("itemConfigMachine", () => {
   it("defaults size and CONFIRM reaches confirmed", () => {
@@ -23,5 +24,20 @@ describe("itemConfigMachine", () => {
     const a = createActor(itemConfigMachine, { input: { item: plain } }).start();
     a.send({ type: "SET_SIZE", sizeId: "L" });
     expect(a.getSnapshot().context.size).toBe("L");
+  });
+  it("requires and independently stores both half selections", () => {
+    const a = createActor(itemConfigMachine, { input: { item: halfAndHalf } }).start();
+    a.send({ type: "CONFIRM" });
+    expect(a.getSnapshot().status).toBe("active");
+
+    a.send({ type: "SET_SINGLE", groupId: "halfLeft", optionId: "pizza-plain" });
+    expect(a.getSnapshot().context.groups.halfLeft).toBe("pizza-plain");
+    a.send({ type: "CONFIRM" });
+    expect(a.getSnapshot().status).toBe("active");
+
+    a.send({ type: "SET_SINGLE", groupId: "halfRight", optionId: "pizza-deluxe" });
+    expect(a.getSnapshot().context.groups.halfRight).toBe("pizza-deluxe");
+    a.send({ type: "CONFIRM" });
+    expect(a.getSnapshot().status).toBe("done");
   });
 });

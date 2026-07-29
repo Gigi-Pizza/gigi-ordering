@@ -28,9 +28,16 @@ export const OptionGroup = Schema.Union(
 );
 export type OptionGroupT = Schema.Schema.Type<typeof OptionGroup>;
 
+export const BasePricePolicy = Schema.Struct({
+  kind: Schema.Literal("maxOfSingleGroups"),
+  groupIds: Schema.Array(Schema.String),
+});
+export type BasePricePolicyT = Schema.Schema.Type<typeof BasePricePolicy>;
+
 export const ItemDefinition = Schema.Struct({
   templateId: Schema.optional(Schema.String),
   basePrice: Price,
+  basePricePolicy: Schema.optional(BasePricePolicy),
   groups: Schema.Array(OptionGroup),
 });
 export type ItemDefinitionT = Schema.Schema.Type<typeof ItemDefinition>;
@@ -39,6 +46,9 @@ export const MenuItem = Schema.Struct({
   id: Schema.String,
   name: Bilingual,
   category: Schema.String,
+  // Ingredient / composition line shown on the selection page (optional — flat
+  // items like drinks don't need one).
+  description: Schema.optional(Bilingual),
   definition: ItemDefinition,
 });
 export type MenuItemT = Schema.Schema.Type<typeof MenuItem>;

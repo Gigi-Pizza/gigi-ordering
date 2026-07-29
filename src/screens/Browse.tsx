@@ -6,7 +6,32 @@ import { useOrderingCopy } from "../copy";
 
 const CATEGORIES = ["pizza", "subs", "pasta", "extras", "drinks"];
 
+// Selection-page display name: append the product word ("Pizza" / "Sub" in EN,
+// prepended in FR word order) unless the name already contains it (e.g. "Pizza
+// Super", "Half & Half" stays as-is only when it already reads as a pizza).
+function displayName(item: MenuItemT, lang: "en" | "fr"): string {
+  const name = pick(item.name, lang);
+  const has = (word: string) => name.toLowerCase().includes(word);
+  if (item.category === "pizza") {
+    if (has("pizza")) return name;
+    return lang === "fr" ? `Pizza ${name}` : `${name} Pizza`;
+  }
+  if (item.category === "subs") {
+    if (has("sub") || has("sous-marin")) return name;
+    return lang === "fr" ? `Sous-marin ${name}` : `${name} Sub`;
+  }
+  return name;
+}
+
 function fromPrice(item: MenuItemT, lang: "en" | "fr"): string {
+  if (item.definition.basePricePolicy?.kind === "maxOfSingleGroups") {
+    const policyOptions = item.definition.basePricePolicy.groupIds
+      .map((groupId) => item.definition.groups.find((group) => group.id === groupId))
+      .flatMap((group) => group && group.kind === "single" ? [...group.options] : []);
+    const cents = Math.min(...policyOptions.flatMap((option) =>
+      option.price.kind === "flat" ? [option.price.cents] : Object.values(option.price.table)));
+    return money(Number.isFinite(cents) ? cents : 0, lang);
+  }
   const bp = item.definition.basePrice;
   const cents = bp.kind === "flat" ? bp.cents : Math.min(...Object.values(bp.table));
   return money(cents, lang);
@@ -37,8 +62,9 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, onViewCart
         {items.map((item) => (
           <MenuItemCard
             key={item.id}
-            heading={pick(item.name, lang)}
-            description={`${t.from} ${fromPrice(item, lang)}`}
+            heading={displayName(item, lang)}
+            description={item.description ? pick(item.description, lang) : ""}
+            price={`${t.from} ${fromPrice(item, lang)}`}
             actionLabel={t.customize}
             onAction={() => onSelect(item)}
           />

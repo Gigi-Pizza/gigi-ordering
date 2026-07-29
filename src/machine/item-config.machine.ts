@@ -4,6 +4,7 @@ import { defaultSize, isConfigValid, resetInvalidForSize, type ItemConfigState }
 
 type Ev =
   | { type: "SET_SIZE"; sizeId: string }
+  | { type: "SET_SINGLE"; groupId: string; optionId: string }
   | { type: "TOGGLE_MULTI"; groupId: string; optionId: string }
   | { type: "SET_TEXT"; groupId: string; value: string }
   | { type: "SET_QUANTITY"; quantity: number }
@@ -14,6 +15,10 @@ export const itemConfigMachine = setup({
   guards: { canConfirm: ({ context }) => isConfigValid(context) },
   actions: {
     setSize: assign(({ context, event }) => (event.type === "SET_SIZE" ? resetInvalidForSize(context, event.sizeId) : {})),
+    setSingle: assign(({ context, event }) =>
+      event.type === "SET_SINGLE"
+        ? { groups: { ...context.groups, [event.groupId]: event.optionId } }
+        : {}),
     toggleMulti: assign(({ context, event }) => {
       if (event.type !== "TOGGLE_MULTI") return {};
       const cur = Array.isArray(context.groups[event.groupId]) ? (context.groups[event.groupId] as string[]) : [];
@@ -31,6 +36,7 @@ export const itemConfigMachine = setup({
     configuring: {
       on: {
         SET_SIZE: { actions: "setSize" },
+        SET_SINGLE: { actions: "setSingle" },
         TOGGLE_MULTI: { actions: "toggleMulti" },
         SET_TEXT: { actions: "setText" },
         SET_QUANTITY: { actions: "setQuantity" },

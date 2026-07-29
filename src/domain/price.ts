@@ -9,8 +9,22 @@ export function resolvePrice(price: PriceT, sizeId: string | null): number {
 export type Selection = { size: string | null; groups: Record<string, GroupSelection> };
 
 export function lineTotalCents(def: ItemDefinitionT, selection: Selection, quantity: number): number {
+  const policyGroupIds = new Set(def.basePricePolicy?.groupIds ?? []);
   let unit = resolvePrice(def.basePrice, selection.size);
+
+  if (def.basePricePolicy?.kind === "maxOfSingleGroups") {
+    unit = 0;
+    for (const groupId of def.basePricePolicy.groupIds) {
+      const group = def.groups.find((candidate) => candidate.id === groupId);
+      const selectedId = selection.groups[groupId];
+      if (!group || group.kind !== "single" || typeof selectedId !== "string") continue;
+      const option = group.options.find((candidate) => candidate.id === selectedId);
+      if (option) unit = Math.max(unit, resolvePrice(option.price, selection.size));
+    }
+  }
+
   for (const group of def.groups) {
+    if (policyGroupIds.has(group.id)) continue;
     if (group.kind === "single" || group.kind === "multi") {
       const sel = selection.groups[group.id];
       const chosenIds =

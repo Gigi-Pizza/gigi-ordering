@@ -56,6 +56,16 @@ const EXTRA2_OPTS = [
   // George 2026-07-29: pineapple is an Extra-2-tier pizza topping.
   { id: "pineapple", en: "Pineapple", fr: "Ananas", table: EXTRA2 },
 ];
+
+// George still needs to confirm whether half-pizza toppings receive a partial
+// upcharge. Keep this as one explicit switch; 1 = the recommended full charge.
+export const HALF_TOPPING_PRICE_DIVISOR = 1;
+const halfToppingTable = (table: Record<string, number>): Record<string, number> =>
+  Object.fromEntries(Object.entries(table).map(([size, cents]) => [size, Math.round(cents / HALF_TOPPING_PRICE_DIVISOR)]));
+const HALF_EXTRA_OPTS = [...EXTRA1_OPTS, ...EXTRA2_OPTS].map((option) => ({
+  ...option,
+  table: halfToppingTable(option.table),
+}));
 const SUB_EXTRA_OPTS = [
   { id: "extra-cheese", en: "Extra cheese", fr: "Fromage supplémentaire", table: SUB_EXTRA },
   { id: "extra-steak", en: "Extra steak", fr: "Steak supplémentaire", table: SUB_EXTRA },
@@ -66,8 +76,13 @@ const SUB_EXTRA_OPTS = [
 
 type Item = MenuConfigT["items"][number];
 
-const pizza = (id: string, en: string, fr: string, base: Record<string, number>): Item => ({
-  id, name: bi(en, fr), category: "pizza",
+// Ingredient lines are the bilingual descriptions from the authoritative 2025
+// menu digitization (resources/menu/menu.seed.json).
+const pizza = (
+  id: string, en: string, fr: string, base: Record<string, number>,
+  descEn: string, descFr: string,
+): Item => ({
+  id, name: bi(en, fr), category: "pizza", description: bi(descEn, descFr),
   definition: {
     templateId: "sized-with-addons",
     basePrice: { kind: "bySize", table: base },
@@ -75,8 +90,15 @@ const pizza = (id: string, en: string, fr: string, base: Record<string, number>)
   },
 });
 
-const sub = (id: string, en: string, fr: string, base: Record<string, number>): Item => ({
-  id, name: bi(en, fr), category: "subs",
+// Every submarine carries the same GIGI garnish beyond its named filling; a few
+// have their own ingredient line in the seed. Pass those; default to the garnish.
+const SUB_GARNISH_EN = 'Lettuce, tomatoes, onions, oregano, "GIGI" special dressing and melted cheese';
+const SUB_GARNISH_FR = "Laitue, tomates, oignons, origan, vinaigrette « GIGI » et fromage fondu";
+const sub = (
+  id: string, en: string, fr: string, base: Record<string, number>,
+  descEn: string = SUB_GARNISH_EN, descFr: string = SUB_GARNISH_FR,
+): Item => ({
+  id, name: bi(en, fr), category: "subs", description: bi(descEn, descFr),
   definition: {
     templateId: "sized-simple",
     basePrice: { kind: "bySize", table: base },
@@ -89,6 +111,75 @@ const flat = (id: string, en: string, fr: string, category: string, cents: numbe
   definition: { templateId: "single-price", basePrice: { kind: "flat", cents }, groups: [notes] },
 });
 
+const PIZZA_ITEMS: Item[] = [
+  pizza("pizza-plain", "Cheese", "Fromage", { S: 1515, M: 2045, L: 2625, XL: 3090 },
+    "Pizza sauce and mozzarella cheese", "Sauce à pizza et fromage mozzarella"),
+  pizza("pizza-mushrooms", "Mushrooms", "Champignons", { S: 1680, M: 2385, L: 3005, XL: 3440 },
+    "Pizza sauce, mushrooms, mozzarella cheese", "Sauce à pizza, champignons, fromage mozzarella"),
+  pizza("pizza-green-peppers", "Green Peppers", "Piments verts", { S: 1680, M: 2385, L: 3005, XL: 3440 },
+    "Pizza sauce, green peppers, mozzarella cheese", "Sauce à pizza, piments verts, fromage mozzarella"),
+  pizza("pizza-onions", "Onions", "Oignons", { S: 1680, M: 2385, L: 3005, XL: 3440 },
+    "Pizza sauce, onions, mozzarella cheese", "Sauce à pizza, oignons, fromage mozzarella"),
+  pizza("pizza-pepperoni", "Pepperoni", "Pepperoni", { S: 1730, M: 2505, L: 3220, XL: 3665 },
+    "Pizza sauce, pepperoni, mozzarella cheese", "Sauce à pizza, pepperoni, fromage mozzarella"),
+  pizza("pizza-capicollo", "Capicollo", "Capicollo", { S: 1730, M: 2505, L: 3220, XL: 3665 },
+    "Pizza sauce, capicollo, mozzarella cheese", "Sauce à pizza, capicollo, fromage mozzarella"),
+  pizza("pizza-bacon", "Bacon", "Bacon", { S: 1730, M: 2505, L: 3220, XL: 3665 },
+    "Pizza sauce, bacon, mozzarella cheese", "Sauce à pizza, bacon, fromage mozzarella"),
+  pizza("pizza-bacon-pepperoni", "Bacon + Pepperoni", "Bacon + Pepperoni", { S: 1855, M: 2620, L: 3430, XL: 4170 },
+    "Pizza sauce, bacon, pepperoni, mozzarella cheese", "Sauce à pizza, bacon, pepperoni, fromage mozzarella"),
+  pizza("pizza-anchovies", "Anchovies", "Anchois", { S: 1730, M: 2505, L: 3220, XL: 3665 },
+    "Pizza sauce, anchovies, mozzarella cheese", "Sauce à pizza, anchois, fromage mozzarella"),
+  pizza("pizza-all-dressed", "All Dressed", "Toute Garnie", { S: 1855, M: 2620, L: 3430, XL: 4170 },
+    "Pizza sauce, pepperoni, mushrooms, green peppers, mozzarella cheese",
+    "Sauce à pizza, pepperoni, champignons, piments verts, fromage mozzarella"),
+  pizza("pizza-hawaiian", "Hawaiian", "Hawaïenne", { S: 1855, M: 2620, L: 3430, XL: 4170 },
+    "Pizza sauce, pineapple, capicollo, mozzarella cheese", "Sauce à pizza, ananas, capicollo, fromage mozzarella"),
+  pizza("pizza-vegetarian", "Vegetarian", "Végétarienne", { S: 1855, M: 2620, L: 3430, XL: 4170 },
+    "Pizza sauce, mushrooms, green peppers, onions, green olives, mozzarella cheese",
+    "Sauce à pizza, champignons, piments verts, oignons, olives vertes, fromage mozzarella"),
+  pizza("pizza-deluxe", "Deluxe", "Deluxe", { S: 2100, M: 2870, L: 3970, XL: 4760 },
+    "All Dressed plus bacon and onions", "Toute garnie plus bacon et oignons"),
+  pizza("pizza-gigi", 'Spécial "GIGI"', "Spécial « GIGI »", { S: 2100, M: 2870, L: 3970, XL: 4760 },
+    "All Dressed plus steak", "Toute garnie plus steak"),
+  pizza("pizza-super", "Pizza Super", "Pizza Super", { S: 2100, M: 2870, L: 3970, XL: 4760 },
+    "All Dressed plus bacon and green olives", "Toute garnie plus bacon et olives vertes"),
+];
+
+const halfPizzaOptions: OptionT[] = PIZZA_ITEMS.map((item) => ({
+  id: item.id,
+  label: item.name,
+  price: item.definition.basePrice,
+}));
+
+const halfGroup = (id: string, en: string, fr: string): OptionGroupT => ({
+  kind: "single",
+  id,
+  label: bi(en, fr),
+  required: true,
+  options: halfPizzaOptions,
+});
+
+const HALF_AND_HALF_ITEM: Item = {
+  id: "pizza-half-and-half",
+  name: bi("Half & Half", "Moitié-moitié"),
+  category: "pizza",
+  description: bi("Two pizzas in one — choose a flavour for each half", "Deux pizzas en une — choisissez une saveur par moitié"),
+  definition: {
+    templateId: "half-and-half",
+    basePrice: { kind: "flat", cents: 0 },
+    basePricePolicy: { kind: "maxOfSingleGroups", groupIds: ["halfLeft", "halfRight"] },
+    groups: [
+      sizeGroup(PIZZA_SIZES),
+      halfGroup("halfLeft", "Left half", "Moitié gauche"),
+      halfGroup("halfRight", "Right half", "Moitié droite"),
+      multiGroup("extraLeft", "Left-half extras", "Extras — moitié gauche", HALF_EXTRA_OPTS),
+      multiGroup("extraRight", "Right-half extras", "Extras — moitié droite", HALF_EXTRA_OPTS),
+      notes,
+    ],
+  },
+};
+
 // ── Gigi 2025 config ─────────────────────────────────────────────────────────
 const raw: MenuConfigT = {
   templates: [
@@ -98,29 +189,19 @@ const raw: MenuConfigT = {
     { id: "variant", groups: [] },
   ],
   items: [
-    pizza("pizza-plain", "Plain", "Ordinaire", { S: 1515, M: 2045, L: 2625, XL: 3090 }),
-    pizza("pizza-mushrooms", "Mushrooms", "Champignons", { S: 1680, M: 2385, L: 3005, XL: 3440 }),
-    pizza("pizza-green-peppers", "Green Peppers", "Piments verts", { S: 1680, M: 2385, L: 3005, XL: 3440 }),
-    pizza("pizza-onions", "Onions", "Oignons", { S: 1680, M: 2385, L: 3005, XL: 3440 }),
-    pizza("pizza-pepperoni", "Pepperoni", "Pepperoni", { S: 1730, M: 2505, L: 3220, XL: 3665 }),
-    pizza("pizza-capicollo", "Capicollo", "Capicollo", { S: 1730, M: 2505, L: 3220, XL: 3665 }),
-    pizza("pizza-bacon", "Bacon", "Bacon", { S: 1730, M: 2505, L: 3220, XL: 3665 }),
-    pizza("pizza-bacon-pepperoni", "Bacon + Pepperoni", "Bacon + Pepperoni", { S: 1855, M: 2620, L: 3430, XL: 4170 }),
-    pizza("pizza-anchovies", "Anchovies", "Anchois", { S: 1730, M: 2505, L: 3220, XL: 3665 }),
-    pizza("pizza-all-dressed", "All Dressed", "Toute Garnie", { S: 1855, M: 2620, L: 3430, XL: 4170 }),
-    pizza("pizza-hawaiian", "Hawaiian", "Hawaïenne", { S: 1855, M: 2620, L: 3430, XL: 4170 }),
-    pizza("pizza-vegetarian", "Vegetarian", "Végétarienne", { S: 1855, M: 2620, L: 3430, XL: 4170 }),
-    pizza("pizza-deluxe", "Deluxe", "Deluxe", { S: 2100, M: 2870, L: 3970, XL: 4760 }),
-    pizza("pizza-gigi", 'Spécial "GIGI"', "Spécial « GIGI »", { S: 2100, M: 2870, L: 3970, XL: 4760 }),
-    pizza("pizza-super", "Pizza Super", "Pizza Super", { S: 2100, M: 2870, L: 3970, XL: 4760 }),
+    ...PIZZA_ITEMS,
+    HALF_AND_HALF_ITEM,
 
     sub("sub-steak-capicollo", "Steak and Capicollo", "Steak / Capicollo", { "7": 1165, "10": 1515, "14": 1890 }),
     sub("sub-steak-pepperoni", "Steak and Pepperoni", "Steak / Pepperoni", { "7": 1165, "10": 1515, "14": 1890 }),
     sub("sub-steak-green-peppers", "Steak and Green Peppers", "Steak / Pim. verts", { "7": 1165, "10": 1515, "14": 1890 }),
     sub("sub-steak-mushrooms", "Steak and Mushrooms", "Steak / Champignons", { "7": 1165, "10": 1515, "14": 1890 }),
     sub("sub-steak-steak-steak", "Steak, Steak and More Steak", "Steak, Steak et Steak", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-vegetarian", "Vegetarian", "Végétarien", { "7": 1165, "10": 1515, "14": 1890 }),
-    sub("sub-gigi", 'Spécial "GIGI"', "Spécial « GIGI »", { "7": 1285, "10": 1650, "14": 2065 }),
+    sub("sub-vegetarian", "Vegetarian", "Végétarien", { "7": 1165, "10": 1515, "14": 1890 },
+      "Onions, green peppers, mushrooms, mozzarella cheese", "Oignons, piments verts, champignons, fromage mozzarella"),
+    sub("sub-gigi", 'Spécial "GIGI"', "Spécial « GIGI »", { "7": 1285, "10": 1650, "14": 2065 },
+      "Steak, capicollo, pepperoni, mushrooms, green peppers and melted cheese",
+      "Steak, capicollo, pepperoni, champignons, piments verts et fromage fondu"),
     sub("sub-pepperoni", "Pepperoni", "Pepperoni", { "7": 1165, "10": 1515, "14": 1890 }),
     sub("sub-capicollo-cheese", "Capicollo and Cheese (cold)", "Capicollo Fromage (froid)", { "7": 1165, "10": 1515, "14": 1890 }),
 

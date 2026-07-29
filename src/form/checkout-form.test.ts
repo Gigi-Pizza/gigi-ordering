@@ -17,6 +17,9 @@ describe("checkout field validation", () => {
     expect(ok(PhoneField, "123")).toBe(false);
     expect(ok(PhoneField, "514-697-4587")).toBe(true);
   });
+  it("rejects whitespace-only phone (would trim to empty and break domain decode)", () => {
+    expect(ok(PhoneField, "          ")).toBe(false);
+  });
   it("validates email", () => {
     expect(ok(EmailField, "nope")).toBe(false);
     expect(ok(EmailField, "a@b.co")).toBe(true);

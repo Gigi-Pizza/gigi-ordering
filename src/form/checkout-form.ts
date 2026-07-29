@@ -1,14 +1,14 @@
 import { Schema } from "@esm.sh/effect";
 import type { FulfillmentT, CustomerT } from "../domain/order";
-import { ZONE_IDS } from "../domain/fulfillment-config";
+import { ZONE_IDS, ZoneId } from "../domain/fulfillment-config";
 
 // Field constraints mirror the domain Customer/Fulfillment so the form and the
 // Order agree by construction (one source of truth for "valid").
 export const NameField = Schema.String.pipe(Schema.minLength(1));
-export const PhoneField = Schema.String.pipe(Schema.pattern(/^[0-9()+\-\s]{10,}$/));
+export const PhoneField = Schema.String.pipe(Schema.pattern(/^(?=.*\d)[0-9()+\-\s]{10,}$/));
 export const EmailField = Schema.String.pipe(Schema.pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/));
 export const AddressField = Schema.String.pipe(Schema.minLength(1));
-export const ZoneField = Schema.Literal(...(ZONE_IDS as [string, ...string[]]));
+export const ZoneField = ZoneId;
 
 // Standard Schema wrappers TanStack Form consumes directly as field validators.
 export const nameSchema = Schema.standardSchemaV1(NameField);

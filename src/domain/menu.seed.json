@@ -1,5 +1,5 @@
 {
-  "_doc": "AUTHORITATIVE GIGI menu — the single source of truth for the ordering configurator. gigi-menu-config.ts decodes this into the runtime MenuConfig. Edit menu data (items, prices, descriptions, which option groups apply, notes on/off) HERE, not in the TS. Money is integer cents (CAD).",
+  "_doc": "AUTHORITATIVE GIGI menu — the single source of truth for the ordering configurator. gigi-menu-config.ts decodes this into the runtime MenuConfig. Edit menu data (items, prices, descriptions, which option groups apply, notes on/off) HERE, not in the TS. Money is integer cents (CAD). Item names are full product names (include 'Pizza'/'Sub') so they read correctly on every screen, not just the selection page.",
 
   "priceTables": {
     "extra1": { "S": 520, "M": 630, "L": 700, "XL": 780 },
@@ -81,21 +81,21 @@
       "en": "Pizza",
       "fr": "Pizza",
       "items": [
-        { "id": "pizza-plain", "en": "Cheese", "fr": "Fromage", "template": "sized-with-addons", "prices": { "S": 1515, "M": 2045, "L": 2625, "XL": 3090 }, "descEn": "Pizza sauce and mozzarella cheese", "descFr": "Sauce à pizza et fromage mozzarella" },
-        { "id": "pizza-mushrooms", "en": "Mushrooms", "fr": "Champignons", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, mushrooms, mozzarella cheese", "descFr": "Sauce à pizza, champignons, fromage mozzarella" },
-        { "id": "pizza-green-peppers", "en": "Green Peppers", "fr": "Piments verts", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, green peppers, mozzarella cheese", "descFr": "Sauce à pizza, piments verts, fromage mozzarella" },
-        { "id": "pizza-onions", "en": "Onions", "fr": "Oignons", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, onions, mozzarella cheese", "descFr": "Sauce à pizza, oignons, fromage mozzarella" },
-        { "id": "pizza-pepperoni", "en": "Pepperoni", "fr": "Pepperoni", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, pepperoni, mozzarella cheese", "descFr": "Sauce à pizza, pepperoni, fromage mozzarella" },
-        { "id": "pizza-capicollo", "en": "Capicollo", "fr": "Capicollo", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, capicollo, mozzarella cheese", "descFr": "Sauce à pizza, capicollo, fromage mozzarella" },
-        { "id": "pizza-bacon", "en": "Bacon", "fr": "Bacon", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, bacon, mozzarella cheese", "descFr": "Sauce à pizza, bacon, fromage mozzarella" },
-        { "id": "pizza-bacon-pepperoni", "en": "Bacon + Pepperoni", "fr": "Bacon + Pepperoni", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, bacon, pepperoni, mozzarella cheese", "descFr": "Sauce à pizza, bacon, pepperoni, fromage mozzarella" },
-        { "id": "pizza-anchovies", "en": "Anchovies", "fr": "Anchois", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, anchovies, mozzarella cheese", "descFr": "Sauce à pizza, anchois, fromage mozzarella" },
-        { "id": "pizza-all-dressed", "en": "All Dressed", "fr": "Toute Garnie", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, pepperoni, mushrooms, green peppers, mozzarella cheese", "descFr": "Sauce à pizza, pepperoni, champignons, piments verts, fromage mozzarella" },
-        { "id": "pizza-hawaiian", "en": "Hawaiian", "fr": "Hawaïenne", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, pineapple, capicollo, mozzarella cheese", "descFr": "Sauce à pizza, ananas, capicollo, fromage mozzarella" },
-        { "id": "pizza-vegetarian", "en": "Vegetarian", "fr": "Végétarienne", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, mushrooms, green peppers, onions, green olives, mozzarella cheese", "descFr": "Sauce à pizza, champignons, piments verts, oignons, olives vertes, fromage mozzarella" },
-        { "id": "pizza-deluxe", "en": "Deluxe", "fr": "Deluxe", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus bacon and onions", "descFr": "Toute garnie plus bacon et oignons" },
-        { "id": "pizza-gigi", "en": "Spécial \"GIGI\"", "fr": "Spécial « GIGI »", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus steak", "descFr": "Toute garnie plus steak" },
-        { "id": "pizza-super", "en": "Pizza Super", "fr": "Pizza Super", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus bacon and green olives", "descFr": "Toute garnie plus bacon et olives vertes" }
+        { "id": "pizza-plain", "en": "Cheese Pizza", "fr": "Pizza au fromage", "template": "sized-with-addons", "prices": { "S": 1515, "M": 2045, "L": 2625, "XL": 3090 }, "descEn": "Pizza sauce and mozzarella cheese", "descFr": "Sauce à pizza et fromage mozzarella" },
+        { "id": "pizza-mushrooms", "en": "Mushroom Pizza", "fr": "Pizza aux champignons", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, mushrooms, mozzarella cheese", "descFr": "Sauce à pizza, champignons, fromage mozzarella" },
+        { "id": "pizza-green-peppers", "en": "Green Pepper Pizza", "fr": "Pizza aux piments verts", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, green peppers, mozzarella cheese", "descFr": "Sauce à pizza, piments verts, fromage mozzarella" },
+        { "id": "pizza-onions", "en": "Onion Pizza", "fr": "Pizza aux oignons", "template": "sized-with-addons", "prices": { "S": 1680, "M": 2385, "L": 3005, "XL": 3440 }, "descEn": "Pizza sauce, onions, mozzarella cheese", "descFr": "Sauce à pizza, oignons, fromage mozzarella" },
+        { "id": "pizza-pepperoni", "en": "Pepperoni Pizza", "fr": "Pizza pepperoni", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, pepperoni, mozzarella cheese", "descFr": "Sauce à pizza, pepperoni, fromage mozzarella" },
+        { "id": "pizza-capicollo", "en": "Capicollo Pizza", "fr": "Pizza capicollo", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, capicollo, mozzarella cheese", "descFr": "Sauce à pizza, capicollo, fromage mozzarella" },
+        { "id": "pizza-bacon", "en": "Bacon Pizza", "fr": "Pizza bacon", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, bacon, mozzarella cheese", "descFr": "Sauce à pizza, bacon, fromage mozzarella" },
+        { "id": "pizza-bacon-pepperoni", "en": "Bacon & Pepperoni Pizza", "fr": "Pizza bacon et pepperoni", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, bacon, pepperoni, mozzarella cheese", "descFr": "Sauce à pizza, bacon, pepperoni, fromage mozzarella" },
+        { "id": "pizza-anchovies", "en": "Anchovy Pizza", "fr": "Pizza aux anchois", "template": "sized-with-addons", "prices": { "S": 1730, "M": 2505, "L": 3220, "XL": 3665 }, "descEn": "Pizza sauce, anchovies, mozzarella cheese", "descFr": "Sauce à pizza, anchois, fromage mozzarella" },
+        { "id": "pizza-all-dressed", "en": "All Dressed Pizza", "fr": "Pizza toute garnie", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, pepperoni, mushrooms, green peppers, mozzarella cheese", "descFr": "Sauce à pizza, pepperoni, champignons, piments verts, fromage mozzarella" },
+        { "id": "pizza-hawaiian", "en": "Hawaiian Pizza", "fr": "Pizza hawaïenne", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, pineapple, capicollo, mozzarella cheese", "descFr": "Sauce à pizza, ananas, capicollo, fromage mozzarella" },
+        { "id": "pizza-vegetarian", "en": "Vegetarian Pizza", "fr": "Pizza végétarienne", "template": "sized-with-addons", "prices": { "S": 1855, "M": 2620, "L": 3430, "XL": 4170 }, "descEn": "Pizza sauce, mushrooms, green peppers, onions, green olives, mozzarella cheese", "descFr": "Sauce à pizza, champignons, piments verts, oignons, olives vertes, fromage mozzarella" },
+        { "id": "pizza-deluxe", "en": "Deluxe Pizza", "fr": "Pizza deluxe", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus bacon and onions", "descFr": "Toute garnie plus bacon et oignons" },
+        { "id": "pizza-gigi", "en": "Spécial \"GIGI\" Pizza", "fr": "Pizza Spécial « GIGI »", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus steak", "descFr": "Toute garnie plus steak" },
+        { "id": "pizza-super", "en": "Super Pizza", "fr": "Pizza Super", "template": "sized-with-addons", "prices": { "S": 2100, "M": 2870, "L": 3970, "XL": 4760 }, "descEn": "All Dressed plus bacon and green olives", "descFr": "Toute garnie plus bacon et olives vertes" }
       ]
     },
     {
@@ -105,15 +105,15 @@
       "defaultDescEn": "Lettuce, tomatoes, onions, oregano, \"GIGI\" special dressing and melted cheese",
       "defaultDescFr": "Laitue, tomates, oignons, origan, vinaigrette « GIGI » et fromage fondu",
       "items": [
-        { "id": "sub-steak-capicollo", "en": "Steak and Capicollo", "fr": "Steak / Capicollo", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
-        { "id": "sub-steak-pepperoni", "en": "Steak and Pepperoni", "fr": "Steak / Pepperoni", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
-        { "id": "sub-steak-green-peppers", "en": "Steak and Green Peppers", "fr": "Steak / Pim. verts", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
-        { "id": "sub-steak-mushrooms", "en": "Steak and Mushrooms", "fr": "Steak / Champignons", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
-        { "id": "sub-steak-steak-steak", "en": "Steak, Steak and More Steak", "fr": "Steak, Steak et Steak", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
-        { "id": "sub-vegetarian", "en": "Vegetarian", "fr": "Végétarien", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 }, "descEn": "Onions, green peppers, mushrooms, mozzarella cheese", "descFr": "Oignons, piments verts, champignons, fromage mozzarella" },
-        { "id": "sub-gigi", "en": "Spécial \"GIGI\"", "fr": "Spécial « GIGI »", "template": "sized-simple", "prices": { "7": 1285, "10": 1650, "14": 2065 }, "descEn": "Steak, capicollo, pepperoni, mushrooms, green peppers and melted cheese", "descFr": "Steak, capicollo, pepperoni, champignons, piments verts et fromage fondu" },
-        { "id": "sub-pepperoni", "en": "Pepperoni", "fr": "Pepperoni", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
-        { "id": "sub-capicollo-cheese", "en": "Capicollo and Cheese (cold)", "fr": "Capicollo Fromage (froid)", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } }
+        { "id": "sub-steak-capicollo", "en": "Steak & Capicollo Sub", "fr": "Sous-marin steak et capicollo", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-pepperoni", "en": "Steak & Pepperoni Sub", "fr": "Sous-marin steak et pepperoni", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-green-peppers", "en": "Steak & Green Peppers Sub", "fr": "Sous-marin steak et piments verts", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-mushrooms", "en": "Steak & Mushrooms Sub", "fr": "Sous-marin steak et champignons", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-steak-steak-steak", "en": "Steak, Steak & More Steak Sub", "fr": "Sous-marin steak, steak et steak", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-vegetarian", "en": "Vegetarian Sub", "fr": "Sous-marin végétarien", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 }, "descEn": "Onions, green peppers, mushrooms, mozzarella cheese", "descFr": "Oignons, piments verts, champignons, fromage mozzarella" },
+        { "id": "sub-gigi", "en": "Spécial \"GIGI\" Sub", "fr": "Sous-marin Spécial « GIGI »", "template": "sized-simple", "prices": { "7": 1285, "10": 1650, "14": 2065 }, "descEn": "Steak, capicollo, pepperoni, mushrooms, green peppers and melted cheese", "descFr": "Steak, capicollo, pepperoni, champignons, piments verts et fromage fondu" },
+        { "id": "sub-pepperoni", "en": "Pepperoni Sub", "fr": "Sous-marin pepperoni", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } },
+        { "id": "sub-capicollo-cheese", "en": "Capicollo & Cheese Sub (cold)", "fr": "Sous-marin capicollo et fromage (froid)", "template": "sized-simple", "prices": { "7": 1165, "10": 1515, "14": 1890 } }
       ]
     },
     {
@@ -167,8 +167,8 @@
   "halfAndHalf": {
     "id": "pizza-half-and-half",
     "category": "pizza",
-    "en": "Half & Half",
-    "fr": "Moitié-moitié",
+    "en": "Half & Half Pizza",
+    "fr": "Pizza moitié-moitié",
     "descEn": "Two pizzas in one — choose a flavour for each half",
     "descFr": "Deux pizzas en une — choisissez une saveur par moitié",
     "sizeSet": "pizza",

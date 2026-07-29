@@ -6,6 +6,7 @@ import { gigiMenuConfig } from "./domain/gigi-menu-config";
 import { Browse } from "./screens/Browse";
 import { Configure } from "./screens/Configure";
 import { Cart } from "./screens/Cart";
+import { Checkout } from "./screens/Checkout";
 import { Placeholder } from "./screens/Placeholder";
 import { useOrderingCopy } from "./copy";
 
@@ -48,21 +49,13 @@ export default function OrderingSlice(_props: { context?: RuntimeModuleContext }
 
   if (value === "checkout") {
     return (
-      <Placeholder
-        title={t.checkout}
-        message={t.checkout}
-        actionLabel={t.placeOrder}
+      <Checkout
         onBack={() => send({ type: "BACK_TO_CART" })}
-        onAction={() => {
-          // Sub-plan 4 replaces this stub with the TanStack Form checkout that
-          // captures real fulfillment + customer details. For now, default to
-          // pickup so canPlace passes and the confirmation screen is reachable.
-          send({ type: "SET_FULFILLMENT", fulfillment: { mode: "pickup" } });
-          send({
-            type: "PLACE",
-            customer: { name: "Guest", phone: "5146974587", email: "guest@example.com" },
-            createdAt: new Date().toISOString(),
-          });
+        onPlace={(fulfillment, customer) => {
+          // canPlace requires fulfillment !== null; set it, then place. Both
+          // events process synchronously so the PLACE guard passes.
+          send({ type: "SET_FULFILLMENT", fulfillment });
+          send({ type: "PLACE", customer, createdAt: new Date().toISOString() });
         }}
       />
     );

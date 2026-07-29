@@ -158,7 +158,8 @@
         { "id": "drink-apple-juice", "en": "Apple Juice", "fr": "Jus de pomme", "template": "beverage", "price": 325 },
         { "id": "drink-brio", "en": "Brio", "fr": "Brio", "template": "beverage", "price": 350 },
         { "id": "drink-tea-coffee", "en": "Tea or Coffee", "fr": "Thé ou café", "template": "beverage", "price": 250 },
-        { "id": "drink-perrier", "en": "Perrier", "fr": "Perrier", "template": "beverage", "price": 410 }
+        { "id": "drink-perrier", "en": "Perrier", "fr": "Perrier", "template": "beverage", "price": 410 },
+        { "id": "drink-eska-water", "en": "Eska Water", "fr": "Eau Eska", "template": "beverage", "price": 325 }
       ]
     }
   ],

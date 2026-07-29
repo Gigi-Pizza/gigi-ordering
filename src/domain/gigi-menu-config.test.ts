@@ -15,10 +15,10 @@ describe("gigiMenuConfig", () => {
     expect(pizza!.definition.groups.some((g) => g.id === "size" && g.kind === "single")).toBe(true);
   });
 
-  it("covers all 49 items across the five categories", () => {
+  it("covers all 50 items across the five categories", () => {
     const byCat = (c: string) => gigiMenuConfig.items.filter((i) => i.category === c).length;
     expect({ pizza: byCat("pizza"), subs: byCat("subs"), pasta: byCat("pasta"), extras: byCat("extras"), drinks: byCat("drinks") })
-      .toEqual({ pizza: 16, subs: 9, pasta: 4, extras: 5, drinks: 15 });
+      .toEqual({ pizza: 16, subs: 9, pasta: 4, extras: 5, drinks: 16 });
   });
 
   it("gives drinks NO special-instructions (notes) group, but keeps it on pasta", () => {

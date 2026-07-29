@@ -7,6 +7,7 @@ const copy = {
     customize: "Customize", from: "From", back: "Back", addToCart: "Add to cart", viewCart: "View cart",
     cart: "Your cart", checkout: "Checkout", total: "Total", remove: "Remove", notes: "Special instructions",
     empty: "Your cart is empty.", placeOrder: "Place order", pickup: "Pickup", delivery: "Delivery", name: "Name", phone: "Phone", email: "Email", address: "Address", zone: "Delivery zone", confirmed: "Order ready to send", size: "Size", each: "each", quantity: "Quantity",
+    errName: "Please enter your name", errPhone: "Enter a valid phone number", errEmail: "Enter a valid email address", errAddress: "Please enter your delivery address",
   },
   fr: {
     title: "Commander en ligne",
@@ -14,6 +15,7 @@ const copy = {
     customize: "Personnaliser", from: "À partir de", back: "Retour", addToCart: "Ajouter au panier", viewCart: "Voir le panier",
     cart: "Votre panier", checkout: "Passer à la caisse", total: "Total", remove: "Retirer", notes: "Instructions spéciales",
     empty: "Votre panier est vide.", placeOrder: "Commander", pickup: "À emporter", delivery: "Livraison", name: "Nom", phone: "Téléphone", email: "Courriel", address: "Adresse", zone: "Zone de livraison", confirmed: "Commande prête à envoyer", size: "Format", each: "ch.", quantity: "Quantité",
+    errName: "Veuillez entrer votre nom", errPhone: "Entrez un numéro de téléphone valide", errEmail: "Entrez une adresse courriel valide", errAddress: "Veuillez entrer votre adresse de livraison",
   },
 };
 

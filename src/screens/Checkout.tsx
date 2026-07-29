@@ -10,12 +10,11 @@ import {
 import { pick } from "../lib/format";
 import { useOrderingCopy } from "../copy";
 
-// First validation issue's message, if any (Standard Schema issues are {message}).
-function firstError(errors: unknown[]): string | undefined {
-  const e = errors[0] as { message?: string } | string | undefined;
-  if (!e) return undefined;
-  return typeof e === "string" ? e : e.message;
-}
+// Show our own friendly, bilingual message when a field has ANY validation
+// issue — never the raw Effect Schema string (which leaks the regex to the
+// customer). `msg` is the per-field copy for the current language.
+const fieldError = (errors: unknown[], msg: string): string | undefined =>
+  errors.length > 0 ? msg : undefined;
 
 export function Checkout({ onBack, onPlace }: {
   onBack: () => void;
@@ -48,21 +47,21 @@ export function Checkout({ onBack, onPlace }: {
                 <form.Field name="name" validators={{ onChange: nameSchema }}>
                   {(field) => (
                     <FormField label={t.name} value={field.state.value}
-                      error={firstError(field.state.meta.errors)}
+                      error={fieldError(field.state.meta.errors, t.errName)}
                       onChange={(e) => field.handleChange(e.target.value)} />
                   )}
                 </form.Field>
                 <form.Field name="phone" validators={{ onChange: phoneSchema }}>
                   {(field) => (
                     <FormField label={t.phone} value={field.state.value}
-                      error={firstError(field.state.meta.errors)}
+                      error={fieldError(field.state.meta.errors, t.errPhone)}
                       onChange={(e) => field.handleChange(e.target.value)} />
                   )}
                 </form.Field>
                 <form.Field name="email" validators={{ onChange: emailSchema }}>
                   {(field) => (
                     <FormField label={t.email} value={field.state.value}
-                      error={firstError(field.state.meta.errors)}
+                      error={fieldError(field.state.meta.errors, t.errEmail)}
                       onChange={(e) => field.handleChange(e.target.value)} />
                   )}
                 </form.Field>
@@ -72,7 +71,7 @@ export function Checkout({ onBack, onPlace }: {
                     <form.Field name="address" validators={{ onChange: addressSchema }}>
                       {(field) => (
                         <FormField label={t.address} value={field.state.value}
-                          error={firstError(field.state.meta.errors)}
+                          error={fieldError(field.state.meta.errors, t.errAddress)}
                           onChange={(e) => field.handleChange(e.target.value)} />
                       )}
                     </form.Field>

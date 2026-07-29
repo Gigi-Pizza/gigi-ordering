@@ -34,7 +34,7 @@ export function Checkout({ onBack, onPlace }: {
           <form.Subscribe selector={(s) => s.values.mode}>
             {(mode) => (
               <React.Fragment>
-                <section>
+                <section className="gigi-checkout-section gigi-checkout-section--method">
                   <h2>{t.checkout}</h2>
                   <div className="gigi-choice-grid">
                     <Button type="button" fullWidth variant={mode === "pickup" ? "primary" : "neutral"}
@@ -46,21 +46,21 @@ export function Checkout({ onBack, onPlace }: {
 
                 <form.Field name="name" validators={{ onChange: nameSchema }}>
                   {(field) => (
-                    <FormField label={t.name} value={field.state.value}
+                    <FormField className="gigi-checkout-field gigi-checkout-field--name" label={t.name} value={field.state.value}
                       error={fieldError(field.state.meta.errors, t.errName)}
                       onChange={(e) => field.handleChange(e.target.value)} />
                   )}
                 </form.Field>
                 <form.Field name="phone" validators={{ onChange: phoneSchema }}>
                   {(field) => (
-                    <FormField label={t.phone} value={field.state.value}
+                    <FormField className="gigi-checkout-field gigi-checkout-field--phone" label={t.phone} value={field.state.value}
                       error={fieldError(field.state.meta.errors, t.errPhone)}
                       onChange={(e) => field.handleChange(e.target.value)} />
                   )}
                 </form.Field>
                 <form.Field name="email" validators={{ onChange: emailSchema }}>
                   {(field) => (
-                    <FormField label={t.email} value={field.state.value}
+                    <FormField className="gigi-checkout-field gigi-checkout-field--email" label={t.email} value={field.state.value}
                       error={fieldError(field.state.meta.errors, t.errEmail)}
                       onChange={(e) => field.handleChange(e.target.value)} />
                   )}
@@ -70,14 +70,14 @@ export function Checkout({ onBack, onPlace }: {
                   <React.Fragment>
                     <form.Field name="address" validators={{ onChange: addressSchema }}>
                       {(field) => (
-                        <FormField label={t.address} value={field.state.value}
+                        <FormField className="gigi-checkout-field gigi-checkout-field--address" label={t.address} value={field.state.value}
                           error={fieldError(field.state.meta.errors, t.errAddress)}
                           onChange={(e) => field.handleChange(e.target.value)} />
                       )}
                     </form.Field>
                     <form.Field name="zone">
                       {(field) => (
-                        <section>
+                        <section className="gigi-checkout-section gigi-checkout-section--zone">
                           <h2>{t.zone}</h2>
                           <div className="gigi-choice-grid">
                             {DELIVERY_ZONES.map((z) => (

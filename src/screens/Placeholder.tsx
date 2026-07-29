@@ -14,7 +14,9 @@ export function Placeholder({ title, message, actionLabel, onAction, onBack, det
   return (
     <MobileShell>
       <TopBar title={title} onBack={onBack} backLabel={t.back} />
-      <main className="gigi-screen-content">
+      <main className="gigi-screen-content gigi-screen-content--placeholder gigi-confirmation">
+        <div className="gigi-confirmation__mark" aria-hidden="true">✓</div>
+        <h1>{title}</h1>
         <p>{message}</p>
         {detail && <pre style={{ whiteSpace: "pre-wrap", fontSize: "0.7rem", overflow: "auto" }}>{detail}</pre>}
       </main>

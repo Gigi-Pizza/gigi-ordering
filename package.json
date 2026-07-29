@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gigi/runtime-manifest": "git+https://github.com/Gigi-Pizza/gigi-manifest.git#v0.2.0",
+    "@gigi/runtime-manifest": "git+https://github.com/Gigi-Pizza/gigi-manifest.git#v0.3.0",
     "@rmc-toolkit/core": "0.5.0",
     "@rmc-toolkit/vite": "0.5.0"
   },

@@ -45,12 +45,16 @@ const EXTRA1_OPTS = [
   { id: "capicollo", en: "Capicollo", fr: "Capicollo", table: EXTRA1 },
   { id: "anchovies", en: "Anchovies", fr: "Anchois", table: EXTRA1 },
   { id: "extra-cheese", en: "Extra cheese", fr: "Fromage supplémentaire", table: EXTRA1 },
+  // George 2026-07-29: steak is an Extra-1-tier pizza topping.
+  { id: "steak", en: "Steak", fr: "Steak", table: EXTRA1 },
 ];
 const EXTRA2_OPTS = [
   { id: "mushrooms", en: "Mushrooms", fr: "Champignons", table: EXTRA2 },
   { id: "green-peppers", en: "Green peppers", fr: "Piments verts", table: EXTRA2 },
   { id: "onions", en: "Onions", fr: "Oignons", table: EXTRA2 },
   { id: "green-olives", en: "Green olives", fr: "Olives vertes", table: EXTRA2 },
+  // George 2026-07-29: pineapple is an Extra-2-tier pizza topping.
+  { id: "pineapple", en: "Pineapple", fr: "Ananas", table: EXTRA2 },
 ];
 const SUB_EXTRA_OPTS = [
   { id: "extra-cheese", en: "Extra cheese", fr: "Fromage supplémentaire", table: SUB_EXTRA },

@@ -20,11 +20,11 @@ declare module "@gigi/ux/index.mjs" {
   export const TopBar: ComponentType<{ title: string; onBack?: () => void; backLabel?: string }>;
   export const MenuItemCard: ComponentType<{ heading: string; description: string; price?: string; selected?: boolean; actionLabel?: string; onAction?: () => void }>;
   export const QuantityControl: ComponentType<{ label: string; price: number; quantity: number; currency?: string; onChange?: (q: number) => void }>;
-  export const FormField: ComponentType<{ label: string; error?: string; description?: string; value?: string; onChange?: (e: { target: { value: string } }) => void; placeholder?: string }>;
+  export const FormField: ComponentType<{ label: string; error?: string; description?: string; value?: string; onChange?: (e: { target: { value: string } }) => void; placeholder?: string; className?: string }>;
   export const OrderSummary: ComponentType<{ lines: { label: string; value: string; emphasized?: boolean }[] }>;
   export const StickyAction: ComponentType<{ children: ReactNode; disabled?: boolean; onClick?: () => void; secondaryLabel?: string; onSecondaryClick?: () => void }>;
   export const ChoiceButtonGroup: ComponentType<{
-    options: readonly { id: string; label: ReactNode }[];
+    options: readonly { id: string; label: ReactNode; price?: ReactNode }[];
     selectedIds?: readonly string[];
     onSelect?: (optionId: string) => void;
     columns?: 1 | 2;

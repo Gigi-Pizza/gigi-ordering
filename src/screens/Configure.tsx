@@ -31,7 +31,7 @@ export function Configure({ item, onCancel, onAddToCart }: {
             const selectedId = g.id === "size" ? ctx.size : ctx.groups[g.id];
             const isHalfGroup = g.id === "halfLeft" || g.id === "halfRight";
             return (
-              <section key={g.id} className={`gigi-config-section gigi-config-section--${g.id}${isHalfGroup ? " gigi-half-config-section" : ""}`}>
+              <section key={g.id} className={`gigi-config-section gigi-config-section--single gigi-config-section--${g.id}${isHalfGroup ? " gigi-half-config-section" : ""}`}>
                 <h2>{pick(g.label, lang)}</h2>
                 <ChoiceButtonGroup
                   ariaLabel={pick(g.label, lang)}
@@ -39,7 +39,8 @@ export function Configure({ item, onCancel, onAddToCart }: {
                   selectedIds={typeof selectedId === "string" ? [selectedId] : []}
                   options={g.options.map((o) => ({
                     id: o.id,
-                    label: `${pick(o.label, lang)}${g.id !== "size" ? ` · ${money(resolvePrice(o.price, ctx.size), lang)}` : ""}`,
+                    label: pick(o.label, lang),
+                    price: g.id !== "size" ? money(resolvePrice(o.price, ctx.size), lang) : undefined,
                   }))}
                   onSelect={(optionId) => g.id === "size"
                     ? send({ type: "SET_SIZE", sizeId: optionId })
@@ -52,7 +53,7 @@ export function Configure({ item, onCancel, onAddToCart }: {
             const sel = Array.isArray(ctx.groups[g.id]) ? (ctx.groups[g.id] as string[]) : [];
             const isHalfExtraGroup = g.id === "extraLeft" || g.id === "extraRight";
             return (
-              <section key={g.id} className={`gigi-config-section gigi-config-section--${g.id}${isHalfExtraGroup ? " gigi-half-config-section" : ""}`}>
+              <section key={g.id} className={`gigi-config-section gigi-config-section--multi gigi-config-section--${g.id}${isHalfExtraGroup ? " gigi-half-config-section" : ""}`}>
                 <h2>{pick(g.label, lang)}</h2>
                 <ChoiceButtonGroup
                   ariaLabel={pick(g.label, lang)}
@@ -61,7 +62,8 @@ export function Configure({ item, onCancel, onAddToCart }: {
                   showSelectionMark
                   options={g.options.map((o) => ({
                     id: o.id,
-                    label: `${pick(o.label, lang)} · ${money(resolvePrice(o.price, ctx.size), lang)}`,
+                    label: pick(o.label, lang),
+                    price: money(resolvePrice(o.price, ctx.size), lang),
                   }))}
                   onSelect={(optionId) => send({ type: "TOGGLE_MULTI", groupId: g.id, optionId })}
                 />
@@ -71,7 +73,7 @@ export function Configure({ item, onCancel, onAddToCart }: {
           if (g.kind === "text") {
             const val = typeof ctx.groups[g.id] === "string" ? (ctx.groups[g.id] as string) : "";
             return (
-              <section key={g.id} className={`gigi-config-section gigi-config-section--${g.id}`}>
+              <section key={g.id} className={`gigi-config-section gigi-config-section--text gigi-config-section--${g.id}`}>
                 <FormField label={pick(g.label, lang)} value={val}
                   onChange={(e) => send({ type: "SET_TEXT", groupId: g.id, value: e.target.value })} />
               </section>

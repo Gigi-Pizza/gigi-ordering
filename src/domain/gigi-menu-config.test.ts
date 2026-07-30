@@ -23,7 +23,7 @@ describe("gigiMenuConfig", () => {
 
   it("carries an image path on items from the seed", () => {
     const cheese = gigiMenuConfig.items.find((i) => i.id === "pizza-plain");
-    expect(cheese?.image).toBe("/images/menu/pizza-plain.webp");
+    expect(cheese?.image).toBe("/images/pizza-plain.webp");
     expect(gigiMenuConfig.items.every((i) => typeof i.image === "string" && i.image.length > 0)).toBe(true);
   });
 

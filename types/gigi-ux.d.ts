@@ -10,6 +10,8 @@ declare module "@gigi/ux/index.mjs" {
       variant?: ButtonVariant;
       size?: "small" | "medium";
       fullWidth?: boolean;
+      leadingIcon?: ReactNode;
+      trailingIcon?: ReactNode;
       onClick?: () => void;
       disabled?: boolean;
       type?: "button" | "submit";
@@ -30,6 +32,22 @@ declare module "@gigi/ux/index.mjs" {
     columns?: 1 | 2;
     ariaLabel?: string;
     showSelectionMark?: boolean;
+    className?: string;
+  }>;
+  export type MenuCategoryIconType = "pizza" | "submarine" | "pasta" | "extras" | "drinks";
+  export const MenuCategoryIcon: ComponentType<{
+    type: MenuCategoryIconType;
+    label?: string;
+    className?: string;
+    width?: number | string;
+    height?: number | string;
+  }>;
+  export type PizzaPreferenceId = "doneness" | "cheeseAmount" | "sauceAmount" | "crust";
+  export type PizzaPreferenceValues = Partial<Record<PizzaPreferenceId, string | null>>;
+  export const PizzaPreferenceControls: ComponentType<{
+    lang?: "en" | "fr";
+    values?: PizzaPreferenceValues;
+    onChange?: (id: PizzaPreferenceId, value: string | null) => void;
     className?: string;
   }>;
 

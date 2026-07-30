@@ -45,4 +45,24 @@ describe("gigiMenuConfig", () => {
       (group.id === "halfLeft" || group.id === "halfRight") && group.kind === "single" && group.required,
     )).toHaveLength(2);
   });
+
+  it("offers every pizza the no-charge doneness, cheese, sauce, and crust choices", () => {
+    const pizzas = gigiMenuConfig.items.filter((item) => item.category === "pizza");
+    const expected = {
+      doneness: ["well-done", "beyond-well-done"],
+      cheeseAmount: ["easy-cheese", "extra-cheese"],
+      sauceAmount: ["easy-sauce", "extra-sauce"],
+      crust: ["thin-crust", "thick-crust"],
+    };
+
+    for (const pizza of pizzas) {
+      for (const [groupId, optionIds] of Object.entries(expected)) {
+        const group = pizza.definition.groups.find((candidate) => candidate.id === groupId);
+        expect(group, `${pizza.id} is missing ${groupId}`).toMatchObject({ kind: "single", required: false });
+        if (group?.kind !== "single") continue;
+        expect(group.options.map((option) => option.id)).toEqual(optionIds);
+        expect(group.options.every((option) => option.price.kind === "flat" && option.price.cents === 0)).toBe(true);
+      }
+    }
+  });
 });

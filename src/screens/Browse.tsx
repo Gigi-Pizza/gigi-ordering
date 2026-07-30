@@ -1,10 +1,20 @@
 import React from "@esm.sh/react";
-import { MobileShell, Button, MenuItemCard, StickyAction } from "@gigi/ux/index.mjs";
+import {
+  MobileShell, Button, MenuItemCard, StickyAction, MenuCategoryIcon,
+  type MenuCategoryIconType,
+} from "@gigi/ux/index.mjs";
 import type { MenuConfigT, MenuItemT } from "../domain/config-schema";
 import { money, pick } from "../lib/format";
 import { useOrderingCopy } from "../copy";
 
 const CATEGORIES = ["pizza", "subs", "pasta", "extras", "drinks"];
+const CATEGORY_ICONS: Record<string, MenuCategoryIconType> = {
+  pizza: "pizza",
+  subs: "submarine",
+  pasta: "pasta",
+  extras: "extras",
+  drinks: "drinks",
+};
 
 function fromPrice(item: MenuItemT, lang: "en" | "fr"): string {
   if (item.definition.basePricePolicy?.kind === "maxOfSingleGroups") {
@@ -38,7 +48,14 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, cartQuanti
         <h1 className="gigi-ordering-title">{t.title}</h1>
         <nav className="gigi-category-tabs" aria-label="Categories">
           {CATEGORIES.map((c) => (
-            <Button key={c} variant={c === activeCat ? "primary" : "subtle"} size="small" onClick={() => onCat(c)}>
+            <Button
+              key={c}
+              variant={c === activeCat ? "primary" : "subtle"}
+              size="small"
+              leadingIcon={<MenuCategoryIcon type={CATEGORY_ICONS[c] ?? "extras"} />}
+              aria-pressed={c === activeCat}
+              onClick={() => onCat(c)}
+            >
               {t.cats[c]}
             </Button>
           ))}

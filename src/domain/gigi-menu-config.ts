@@ -18,8 +18,10 @@ type PriceTable = Record<string, Cents>;
 type SizeDef = { id: string; en: string; fr: string };
 type CatalogOpt = { id: string; en: string; fr: string };
 type Catalog = { priceTable: string; options: CatalogOpt[] };
+type ChoiceOpt = CatalogOpt & { price: Cents };
+type ChoiceGroupDef = { id: string; en: string; fr: string; required: boolean; options: ChoiceOpt[] };
 type MultiDef = { id: string; en: string; fr: string; catalogs: string[] };
-type TemplateDef = { sizeSet?: string; multiGroups?: MultiDef[]; notes: boolean };
+type TemplateDef = { sizeSet?: string; choiceGroups?: string[]; multiGroups?: MultiDef[]; notes: boolean };
 type ItemDef = {
   id: string; en: string; fr: string; template: string;
   prices?: PriceTable; price?: Cents; descEn?: string; descFr?: string; image?: string;
@@ -31,12 +33,14 @@ type CategoryDef = {
 type HalfSideDef = { id: string; en: string; fr: string; extraId: string; extraEn: string; extraFr: string };
 type HalfDef = {
   id: string; category: string; en: string; fr: string; descEn: string; descFr: string; image?: string;
-  sizeSet: string; toppingDivisor: number; extraCatalogs: string[]; left: HalfSideDef; right: HalfSideDef;
+  sizeSet: string; toppingDivisor: number; extraCatalogs: string[]; choiceGroups: string[];
+  left: HalfSideDef; right: HalfSideDef;
 };
 type Seed = {
   priceTables: Record<string, PriceTable>;
   sizeSets: Record<string, SizeDef[]>;
   toppingCatalogs: Record<string, Catalog>;
+  choiceGroups: Record<string, ChoiceGroupDef>;
   templates: Record<string, TemplateDef>;
   categories: CategoryDef[];
   halfAndHalf: HalfDef;
@@ -84,9 +88,20 @@ function multiGroupFrom(def: MultiDef, divisor = 1): OptionGroupT {
   return { kind: "multi", id: def.id, label: bi(def.en, def.fr), min: 0, max: 12, options: optionsFromCatalogs(def.catalogs, divisor) };
 }
 
+function choiceGroupFrom(name: string): OptionGroupT {
+  const def = need(raw.choiceGroups, name, "choiceGroup");
+  return {
+    kind: "single", id: def.id, label: bi(def.en, def.fr), required: def.required,
+    options: def.options.map((o): OptionT => ({
+      id: o.id, label: bi(o.en, o.fr), price: { kind: "flat", cents: o.price },
+    })),
+  };
+}
+
 function templateGroups(t: TemplateDef): OptionGroupT[] {
   const groups: OptionGroupT[] = [];
   if (t.sizeSet) groups.push(sizeGroupFrom(t.sizeSet));
+  for (const name of t.choiceGroups ?? []) groups.push(choiceGroupFrom(name));
   for (const m of t.multiGroups ?? []) groups.push(multiGroupFrom(m));
   if (t.notes) groups.push(notesGroup);
   return groups;
@@ -136,7 +151,11 @@ function buildHalfAndHalf(pizzaItems: BuiltItem[]): BuiltItem {
       templateId: "half-and-half",
       basePrice: { kind: "flat", cents: 0 },
       basePricePolicy: { kind: "maxOfSingleGroups", groupIds: [h.left.id, h.right.id] },
-      groups: [sizeGroupFrom(h.sizeSet), halfGroup(h.left), halfGroup(h.right), extraGroup(h.left), extraGroup(h.right), notesGroup],
+      groups: [
+        sizeGroupFrom(h.sizeSet),
+        ...h.choiceGroups.map(choiceGroupFrom),
+        halfGroup(h.left), halfGroup(h.right), extraGroup(h.left), extraGroup(h.right), notesGroup,
+      ],
     },
   };
 }

@@ -1,6 +1,9 @@
 import React from "@esm.sh/react";
 import { useMachine } from "@esm.sh/@xstate/react";
-import { MobileShell, TopBar, FormField, QuantityControl, StickyAction, ChoiceButtonGroup } from "@gigi/ux/index.mjs";
+import {
+  MobileShell, TopBar, FormField, QuantityControl, StickyAction, ChoiceButtonGroup,
+  PizzaPreferenceControls, type PizzaPreferenceId, type PizzaPreferenceValues,
+} from "@gigi/ux/index.mjs";
 import type { MenuItemT } from "../domain/config-schema";
 import type { ConfiguredItem } from "../domain/cart";
 import { resolvePrice } from "../domain/price";
@@ -20,6 +23,10 @@ export function Configure({ item, onCancel, onAddToCart }: {
   const unitDollars = liveTotalCents({ ...ctx, quantity: 1 }) / 100;
   const canConfirm = snapshot.can({ type: "CONFIRM" });
   const isHalfAndHalf = item.definition.basePricePolicy?.kind === "maxOfSingleGroups";
+  const pizzaPreferenceIds: PizzaPreferenceId[] = ["doneness", "cheeseAmount", "sauceAmount", "crust"];
+  const preferenceValues = Object.fromEntries(
+    pizzaPreferenceIds.map((id) => [id, typeof ctx.groups[id] === "string" ? ctx.groups[id] : null]),
+  ) as PizzaPreferenceValues;
 
   return (
     <MobileShell>
@@ -27,6 +34,19 @@ export function Configure({ item, onCancel, onAddToCart }: {
       <main className={`gigi-customization gigi-customization--configure${isHalfAndHalf ? " gigi-customization--half" : ""}`}>
         {isHalfAndHalf && <p className="gigi-half-price-note">{t.halfPriceNote}</p>}
         {item.definition.groups.map((g) => {
+          if (g.id === "doneness") {
+            return (
+              <section key="pizza-preferences" className="gigi-config-section gigi-config-section--pizza-preferences">
+                <h2>{lang === "fr" ? "Préférences" : "Preferences"}</h2>
+                <PizzaPreferenceControls
+                  lang={lang}
+                  values={preferenceValues}
+                  onChange={(groupId, optionId) => send({ type: "SET_SINGLE", groupId, optionId })}
+                />
+              </section>
+            );
+          }
+          if (pizzaPreferenceIds.includes(g.id as PizzaPreferenceId)) return null;
           if (g.kind === "single") {
             const selectedId = g.id === "size" ? ctx.size : ctx.groups[g.id];
             const isHalfGroup = g.id === "halfLeft" || g.id === "halfRight";

@@ -4,7 +4,7 @@ import { defaultSize, isConfigValid, resetInvalidForSize, type ItemConfigState }
 
 type Ev =
   | { type: "SET_SIZE"; sizeId: string }
-  | { type: "SET_SINGLE"; groupId: string; optionId: string }
+  | { type: "SET_SINGLE"; groupId: string; optionId: string | null }
   | { type: "TOGGLE_MULTI"; groupId: string; optionId: string }
   | { type: "SET_TEXT"; groupId: string; value: string }
   | { type: "SET_QUANTITY"; quantity: number }

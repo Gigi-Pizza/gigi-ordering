@@ -29,7 +29,6 @@
         { "id": "bacon", "en": "Bacon", "fr": "Bacon" },
         { "id": "capicollo", "en": "Capicollo", "fr": "Capicollo" },
         { "id": "anchovies", "en": "Anchovies", "fr": "Anchois" },
-        { "id": "extra-cheese", "en": "Extra cheese", "fr": "Fromage supplémentaire" },
         { "id": "steak", "en": "Steak", "fr": "Steak" }
       ]
     },
@@ -55,9 +54,53 @@
     }
   },
 
+  "choiceGroups": {
+    "pizzaDoneness": {
+      "id": "doneness",
+      "en": "Doneness",
+      "fr": "Cuisson",
+      "required": false,
+      "options": [
+        { "id": "well-done", "en": "Well done", "fr": "Bien cuite", "price": 0 },
+        { "id": "beyond-well-done", "en": "Beyond well done", "fr": "Très bien cuite", "price": 0 }
+      ]
+    },
+    "pizzaCheese": {
+      "id": "cheeseAmount",
+      "en": "Cheese",
+      "fr": "Fromage",
+      "required": false,
+      "options": [
+        { "id": "easy-cheese", "en": "Easy cheese", "fr": "Peu de fromage", "price": 0 },
+        { "id": "extra-cheese", "en": "Extra cheese", "fr": "Fromage supplémentaire", "price": 0 }
+      ]
+    },
+    "pizzaSauce": {
+      "id": "sauceAmount",
+      "en": "Sauce",
+      "fr": "Sauce",
+      "required": false,
+      "options": [
+        { "id": "easy-sauce", "en": "Easy sauce", "fr": "Peu de sauce", "price": 0 },
+        { "id": "extra-sauce", "en": "Extra sauce", "fr": "Sauce supplémentaire", "price": 0 }
+      ]
+    },
+    "pizzaCrust": {
+      "id": "crust",
+      "en": "Crust",
+      "fr": "Croûte",
+      "required": false,
+      "options": [
+        { "id": "thin-crust", "en": "Thin crust", "fr": "Croûte mince", "price": 0 },
+        { "id": "thick-crust", "en": "Thick crust", "fr": "Croûte épaisse", "price": 0 }
+      ]
+    }
+  },
+
   "templates": {
     "sized-with-addons": {
       "sizeSet": "pizza",
+      "choiceGroups": ["pizzaDoneness", "pizzaCheese", "pizzaSauce", "pizzaCrust"],
       "multiGroups": [
         { "id": "extra1", "en": "Add-ons", "fr": "Garnitures", "catalogs": ["extra1"] },
         { "id": "extra2", "en": "Vegetables", "fr": "Légumes", "catalogs": ["extra2"] }
@@ -175,6 +218,7 @@
     "sizeSet": "pizza",
     "toppingDivisor": 1,
     "extraCatalogs": ["extra1", "extra2"],
+    "choiceGroups": ["pizzaDoneness", "pizzaCheese", "pizzaSauce", "pizzaCrust"],
     "left": { "id": "halfLeft", "en": "Left half", "fr": "Moitié gauche", "extraId": "extraLeft", "extraEn": "Left-half extras", "extraFr": "Extras — moitié gauche" },
     "right": { "id": "halfRight", "en": "Right half", "fr": "Moitié droite", "extraId": "extraRight", "extraEn": "Right-half extras", "extraFr": "Extras — moitié droite" }
   }

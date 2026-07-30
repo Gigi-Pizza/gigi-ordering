@@ -25,6 +25,13 @@ describe("itemConfigMachine", () => {
     a.send({ type: "SET_SIZE", sizeId: "L" });
     expect(a.getSnapshot().context.size).toBe("L");
   });
+  it("can return an optional single choice to its original state", () => {
+    const a = createActor(itemConfigMachine, { input: { item: plain } }).start();
+    a.send({ type: "SET_SINGLE", groupId: "doneness", optionId: "well-done" });
+    expect(a.getSnapshot().context.groups.doneness).toBe("well-done");
+    a.send({ type: "SET_SINGLE", groupId: "doneness", optionId: null });
+    expect(a.getSnapshot().context.groups.doneness).toBeNull();
+  });
   it("requires and independently stores both half selections", () => {
     const a = createActor(itemConfigMachine, { input: { item: halfAndHalf } }).start();
     a.send({ type: "CONFIRM" });

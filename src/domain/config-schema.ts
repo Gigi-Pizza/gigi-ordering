@@ -44,6 +44,9 @@ export type ItemDefinitionT = Schema.Schema.Type<typeof ItemDefinition>;
 
 export const MenuItem = Schema.Struct({
   id: Schema.String,
+  // Stable cross-system menu code (e.g. "PLA001") from the canonical menu seed;
+  // optional (app-only items like drink flavours / half-and-half have none).
+  itemId: Schema.optional(Schema.String),
   name: Bilingual,
   category: Schema.String,
   // Ingredient / composition line shown on the selection page (optional — flat

@@ -21,10 +21,17 @@ describe("gigiMenuConfig", () => {
       .toEqual({ pizza: 16, subs: 9, pasta: 4, extras: 5, drinks: 16 });
   });
 
-  it("carries an image path on items from the seed", () => {
-    const cheese = gigiMenuConfig.items.find((i) => i.id === "pizza-plain");
-    expect(cheese?.image).toBe("/images/pizza-plain.webp");
-    expect(gigiMenuConfig.items.every((i) => typeof i.image === "string" && i.image.length > 0)).toBe(true);
+  it("carries the menu code + real image on catalogued items; app-only items have neither", () => {
+    const byId = (id: string) => gigiMenuConfig.items.find((i) => i.id === id)!;
+    // catalogued items (from the canonical menu seed) get their code + real image
+    expect(byId("pizza-plain").itemId).toBe("PLA001");
+    expect(byId("pizza-plain").image).toBe("/images/menu-icons/photo/PLA001.png");
+    expect(byId("pasta-spaghetti-meat").image).toBe("/images/menu-icons/SPA025.svg");
+    expect(byId("drink-brio").itemId).toBe("BRI035");
+    // app-only additions have no gigipizza code/image → text-only card
+    expect(byId("drink-coke").itemId).toBeUndefined();
+    expect(byId("drink-coke").image).toBeUndefined();
+    expect(byId("pizza-half-and-half").image).toBeUndefined();
   });
 
   it("gives drinks NO special-instructions (notes) group, but keeps it on pasta", () => {

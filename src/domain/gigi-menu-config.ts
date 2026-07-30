@@ -23,7 +23,7 @@ type ChoiceGroupDef = { id: string; en: string; fr: string; required: boolean; o
 type MultiDef = { id: string; en: string; fr: string; catalogs: string[] };
 type TemplateDef = { sizeSet?: string; choiceGroups?: string[]; multiGroups?: MultiDef[]; notes: boolean };
 type ItemDef = {
-  id: string; en: string; fr: string; template: string;
+  id: string; itemId?: string; en: string; fr: string; template: string;
   prices?: PriceTable; price?: Cents; descEn?: string; descFr?: string; image?: string;
 };
 type CategoryDef = {
@@ -118,6 +118,7 @@ function buildItem(it: ItemDef, cat: CategoryDef): BuiltItem {
   const descFr = it.descFr ?? cat.defaultDescFr;
   const item: BuiltItem = {
     id: it.id, name: bi(it.en, it.fr), category: cat.slug,
+    ...(it.itemId !== undefined ? { itemId: it.itemId } : {}),
     ...(descEn !== undefined && descFr !== undefined ? { description: bi(descEn, descFr) } : {}),
     ...(it.image !== undefined ? { image: it.image } : {}),
     definition: { templateId: it.template, basePrice, groups: templateGroups(t) },

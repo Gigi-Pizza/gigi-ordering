@@ -52,7 +52,7 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, cartQuanti
               key={c}
               variant={c === activeCat ? "primary" : "subtle"}
               size="small"
-              leadingIcon={<MenuCategoryIcon type={CATEGORY_ICONS[c] ?? "extras"} />}
+              leadingIcon={<MenuCategoryIcon type={CATEGORY_ICONS[c] ?? "extras"} size={24} />}
               aria-pressed={c === activeCat}
               onClick={() => onCat(c)}
             >
@@ -70,6 +70,8 @@ export function Browse({ menu, activeCat, onCat, onSelect, cartCount, cartQuanti
               heading={pick(item.name, lang)}
               description={item.description ? pick(item.description, lang) : ""}
               price={`${t.from} ${fromPrice(item, lang)}`}
+              imageSrc={item.image}
+              imageAlt=""
               statusLabel={quantityInCart > 0 ? t.inOrder(quantityInCart) : undefined}
               actionLabel={quantityInCart > 0 ? t.addAnother : t.select}
               onAction={() => onSelect(item)}

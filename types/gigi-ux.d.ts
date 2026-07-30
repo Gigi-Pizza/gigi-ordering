@@ -20,7 +20,7 @@ declare module "@gigi/ux/index.mjs" {
   >;
   export const MobileShell: ComponentType<{ children: ReactNode; className?: string }>;
   export const TopBar: ComponentType<{ title: string; onBack?: () => void; backLabel?: string }>;
-  export const MenuItemCard: ComponentType<{ heading: string; description: string; price?: string; statusLabel?: string; selected?: boolean; actionLabel?: string; onAction?: () => void }>;
+  export const MenuItemCard: ComponentType<{ heading: string; description: string; price?: string; statusLabel?: string; imageSrc?: string; imageAlt?: string; selected?: boolean; actionLabel?: string; onAction?: () => void }>;
   export const QuantityControl: ComponentType<{ label: string; price: number; quantity: number; currency?: string; onChange?: (q: number) => void }>;
   export const FormField: ComponentType<{ label: string; error?: string; description?: string; value?: string; onChange?: (e: { target: { value: string } }) => void; placeholder?: string; className?: string }>;
   export const OrderSummary: ComponentType<{ lines: { label: string; value: string; emphasized?: boolean }[] }>;
@@ -38,6 +38,7 @@ declare module "@gigi/ux/index.mjs" {
   export const MenuCategoryIcon: ComponentType<{
     type: MenuCategoryIconType;
     label?: string;
+    size?: number;
     className?: string;
     width?: number | string;
     height?: number | string;

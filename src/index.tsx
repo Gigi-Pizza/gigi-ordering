@@ -10,6 +10,7 @@ import { Checkout } from "./screens/Checkout";
 import { Placeholder } from "./screens/Placeholder";
 import { useOrderingCopy } from "./copy";
 import { quantitiesByItem } from "./domain/cart";
+import { CART_STORAGE_KEY, serializeCart, deserializeCart } from "./domain/cart-persistence";
 
 /**
  * gigi-ordering slice — the config-driven ordering configurator.
@@ -22,24 +23,57 @@ import { quantitiesByItem } from "./domain/cart";
 export default function OrderingSlice(_props: { context?: RuntimeModuleContext }): React.ReactElement {
   const { t } = useOrderingCopy();
   const [activeCat, setActiveCat] = React.useState("pizza");
-  const [snapshot, send] = useMachine(flowMachine, { input: { menu: gigiMenuConfig } });
+  // Restore the cart from localStorage once, re-derived against the current menu.
+  const restored = React.useMemo(() => {
+    let raw: string | null = null;
+    try {
+      raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    } catch {
+      /* localStorage may be unavailable */
+    }
+    return deserializeCart(raw, gigiMenuConfig);
+  }, []);
+  const [noticeDismissed, setNoticeDismissed] = React.useState(false);
+  const [snapshot, send] = useMachine(flowMachine, {
+    input: { menu: gigiMenuConfig, cart: restored.cart },
+  });
   const ctx = snapshot.context;
   const value = snapshot.value as string;
+
+  // Persist choices on every cart change.
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(serializeCart(ctx.cart)));
+    } catch {
+      /* localStorage may be unavailable */
+    }
+  }, [ctx.cart]);
+
+  // Clear the persisted cart once the order is placed.
+  React.useEffect(() => {
+    if (value !== "confirmed") return;
+    try {
+      window.localStorage.removeItem(CART_STORAGE_KEY);
+    } catch {
+      /* localStorage may be unavailable */
+    }
+  }, [value]);
+
+  const showDropNotice = restored.droppedCount > 0 && !noticeDismissed;
   const cartQuantities = quantitiesByItem(ctx.cart);
   const cartCount = Object.values(cartQuantities).reduce((total, quantity) => total + quantity, 0);
 
+  let screen: React.ReactElement;
   if (value === "configuringItem" && ctx.selectedItem) {
-    return (
+    screen = (
       <Configure
         item={ctx.selectedItem}
         onCancel={() => send({ type: "CANCEL_CONFIG" })}
         onAddToCart={(line) => send({ type: "ADD_TO_CART", line })}
       />
     );
-  }
-
-  if (value === "reviewingCart") {
-    return (
+  } else if (value === "reviewingCart") {
+    screen = (
       <Cart
         menu={ctx.menu}
         cart={ctx.cart}
@@ -48,10 +82,8 @@ export default function OrderingSlice(_props: { context?: RuntimeModuleContext }
         onBack={() => send({ type: "BACK_TO_BROWSE" })}
       />
     );
-  }
-
-  if (value === "checkout") {
-    return (
+  } else if (value === "checkout") {
+    screen = (
       <Checkout
         onBack={() => send({ type: "BACK_TO_CART" })}
         onPlace={(fulfillment, customer) => {
@@ -62,21 +94,38 @@ export default function OrderingSlice(_props: { context?: RuntimeModuleContext }
         }}
       />
     );
-  }
-
-  if (value === "confirmed") {
-    return <Placeholder title={t.confirmed} message={t.confirmedBody} />;
+  } else if (value === "confirmed") {
+    screen = <Placeholder title={t.confirmed} message={t.confirmedBody} />;
+  } else {
+    screen = (
+      <Browse
+        menu={ctx.menu}
+        activeCat={activeCat}
+        onCat={setActiveCat}
+        onSelect={(item) => send({ type: "SELECT_ITEM", item })}
+        cartCount={cartCount}
+        cartQuantities={cartQuantities}
+        onViewCart={() => send({ type: "VIEW_CART" })}
+      />
+    );
   }
 
   return (
-    <Browse
-      menu={ctx.menu}
-      activeCat={activeCat}
-      onCat={setActiveCat}
-      onSelect={(item) => send({ type: "SELECT_ITEM", item })}
-      cartCount={cartCount}
-      cartQuantities={cartQuantities}
-      onViewCart={() => send({ type: "VIEW_CART" })}
-    />
+    <React.Fragment>
+      {showDropNotice && (
+        <div className="gigi-cart-notice" role="status">
+          <span>{t.cartItemRemoved}</span>
+          <button
+            type="button"
+            className="gigi-cart-notice__close"
+            aria-label={t.dismiss}
+            onClick={() => setNoticeDismissed(true)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {screen}
+    </React.Fragment>
   );
 }

@@ -9,6 +9,7 @@ const copy = {
     empty: "Your cart is empty.", placeOrder: "Place order", pickup: "Pickup", delivery: "Delivery", name: "Name", phone: "Phone", email: "Email", address: "Address", zone: "Delivery zone", confirmed: "Order received", confirmedBody: "Thanks! Gigi's has received your order and will contact you if anything needs confirmation.", size: "Size", each: "each", quantity: "Quantity",
     halfPriceNote: "Choose one pizza for each half. Your pizza is priced from the more expensive half.",
     errName: "Please enter your name", errPhone: "Enter a valid phone number", errEmail: "Enter a valid email address", errAddress: "Please enter your delivery address",
+    cartItemRemoved: "An item in your cart is no longer available and was removed.", dismiss: "Dismiss",
   },
   fr: {
     title: "Commander en ligne",
@@ -18,6 +19,7 @@ const copy = {
     empty: "Votre panier est vide.", placeOrder: "Commander", pickup: "À emporter", delivery: "Livraison", name: "Nom", phone: "Téléphone", email: "Courriel", address: "Adresse", zone: "Zone de livraison", confirmed: "Commande reçue", confirmedBody: "Merci! Gigi's a reçu votre commande et communiquera avec vous si une confirmation est nécessaire.", size: "Format", each: "ch.", quantity: "Quantité",
     halfPriceNote: "Choisissez une pizza pour chaque moitié. Le prix est basé sur la moitié la plus chère.",
     errName: "Veuillez entrer votre nom", errPhone: "Entrez un numéro de téléphone valide", errEmail: "Entrez une adresse courriel valide", errAddress: "Veuillez entrer votre adresse de livraison",
+    cartItemRemoved: "Un article de votre panier n'est plus disponible et a été retiré.", dismiss: "Fermer",
   },
 };
 

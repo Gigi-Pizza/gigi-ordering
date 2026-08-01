@@ -17,7 +17,7 @@ type Ev =
   | { type: "PLACE"; customer: CustomerT; createdAt: string };
 
 export const flowMachine = setup({
-  types: { context: {} as Ctx, events: {} as Ev, input: {} as { menu: MenuConfigT } },
+  types: { context: {} as Ctx, events: {} as Ev, input: {} as { menu: MenuConfigT; cart?: Cart } },
   guards: {
     cartNonEmpty: ({ context }) => context.cart.lines.length > 0,
     canPlace: ({ context }) => context.cart.lines.length > 0 && context.fulfillment !== null,
@@ -35,7 +35,7 @@ export const flowMachine = setup({
   },
 }).createMachine({
   id: "flow",
-  context: ({ input }) => ({ menu: input.menu, cart: emptyCart(), selectedItem: null, fulfillment: null, order: null }),
+  context: ({ input }) => ({ menu: input.menu, cart: input.cart ?? emptyCart(), selectedItem: null, fulfillment: null, order: null }),
   initial: "browsing",
   states: {
     browsing: {

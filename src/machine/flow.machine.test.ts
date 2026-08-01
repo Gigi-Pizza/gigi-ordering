@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createActor } from "@esm.sh/xstate";
 import { flowMachine } from "./flow.machine";
 import { gigiMenuConfig } from "../domain/gigi-menu-config";
+import { emptyCart, addLine } from "../domain/cart";
 
 const item = gigiMenuConfig.items.find((i) => i.id === "pizza-plain")!;
 const line = { lineId: "l1", itemId: item.id, selection: { size: "M", groups: {} }, quantity: 1, unitCents: 2045, totalCents: 2045 };
@@ -29,5 +30,21 @@ describe("flowMachine", () => {
     const a = createActor(flowMachine, { input: { menu: gigiMenuConfig } }).start();
     a.send({ type: "VIEW_CART" });
     expect(a.getSnapshot().value).toBe("browsing");
+  });
+
+  it("seeds the cart from input when provided", () => {
+    const seeded = addLine(emptyCart(), {
+      lineId: "line-seed", itemId: "pizza-plain",
+      selection: { size: null, groups: {} }, quantity: 1, unitCents: 1000, totalCents: 1000,
+    });
+    const actor = createActor(flowMachine, { input: { menu: gigiMenuConfig, cart: seeded } }).start();
+    expect(actor.getSnapshot().context.cart.lines).toHaveLength(1);
+    actor.stop();
+  });
+
+  it("defaults to an empty cart when no cart input is given", () => {
+    const actor = createActor(flowMachine, { input: { menu: gigiMenuConfig } }).start();
+    expect(actor.getSnapshot().context.cart.lines).toHaveLength(0);
+    actor.stop();
   });
 });
